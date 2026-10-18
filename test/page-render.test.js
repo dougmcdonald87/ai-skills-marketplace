@@ -235,9 +235,10 @@ async function main() {
   checkTrue('index entry meta has publisher', metaText.indexOf('The Register') !== -1);
 
   const firstBtn = first.children[2].children[1];
-  check('index paid button disabled until paypal base is real', firstBtn.className, 'btn');
-  check('index paid button label', firstBtn.textContent, 'Payments opening soon');
-  check('index paid button is aria-disabled', firstBtn.getAttribute('aria-disabled'), 'true');
+  check('index paid button is a paypal button', firstBtn.className, 'btn btn-paypal');
+  check('index paid button label', firstBtn.textContent, 'Buy via PayPal');
+  check('index paid button uses the real handle', firstBtn.href, 'https://paypal.me/dougmcdoald87/29');
+  check('index paid button is not aria-disabled', firstBtn.getAttribute('aria-disabled'), null);
 
   const freeEntry = findEntry(index, 'skill-002');
   check('index free entry price', freeEntry.children[2].children[0].textContent, 'Free');
@@ -281,19 +282,34 @@ async function main() {
   allFilter.listeners.click();
   check('All filter restores the catalogue', entriesOf(index).length, 4);
 
-  // ---------- real paypal base ----------
+  // ---------- the paypal seam ----------
+  // Production data now carries a verified live handle, so the paid button must be live.
+  check('paypalBase is the verified live handle', config.paypalBase, 'https://paypal.me/dougmcdoald87');
+
+  // A placeholder base must NOT produce a live payment link.
+  const placeholder = JSON.parse(JSON.stringify(skills));
+  placeholder.marketplace.paypalBase = 'https://paypal.me/yourname';
+
+  const placeholderIndex = await run('index.html', '', placeholder);
+  const placeholderCard = findEntry(placeholderIndex, 'skill-001');
+  check('placeholder paypal base disables the button', placeholderCard.children[2].children[1].className, 'btn');
+  check('placeholder paypal base shows opening soon', placeholderCard.children[2].children[1].textContent, 'Payments opening soon');
+  check('placeholder paypal base is aria-disabled', placeholderCard.children[2].children[1].getAttribute('aria-disabled'), 'true');
+  check('placeholder paypal base has no paypal href', placeholderCard.children[2].children[1].href, '#');
+
+  // A different real base must be used in full, proving the base is the only source.
   const live = JSON.parse(JSON.stringify(skills));
-  live.marketplace.paypalBase = 'https://paypal.me/dougmcdonald87';
+  live.marketplace.paypalBase = 'https://paypal.me/someoneelse';
 
   const liveIndex = await run('index.html', '', live);
   const liveCard = findEntry(liveIndex, 'skill-001');
   check('live paypal base enables paypal button', liveCard.children[2].children[1].className, 'btn btn-paypal');
-  check('live paypal url uses base and amount', liveCard.children[2].children[1].href, 'https://paypal.me/dougmcdonald87/29');
+  check('live paypal url uses base and amount', liveCard.children[2].children[1].href, 'https://paypal.me/someoneelse/29');
   check('live paypal button label', liveCard.children[2].children[1].textContent, 'Buy via PayPal');
 
   const liveDetail = await run('skill-page.html', '?id=skill-001', live);
   check('live detail paypal class', liveDetail.getElementById('skill-action').className, 'btn btn-paypal');
-  check('live detail paypal href', liveDetail.getElementById('skill-action').href, 'https://paypal.me/dougmcdonald87/29');
+  check('live detail paypal href', liveDetail.getElementById('skill-action').href, 'https://paypal.me/someoneelse/29');
 
   const liveFree = await run('skill-page.html', '?id=skill-002', live);
   check('live free entry stays on github', liveFree.getElementById('skill-action').href, skills.skills[1].github);
@@ -305,6 +321,9 @@ async function main() {
   check('detail desc', page.getElementById('skill-desc').textContent, skills.skills[0].desc);
   check('detail price is GBP', page.getElementById('skill-price').textContent, '£29');
   check('detail card visible', page.getElementById('entry-detail').hidden, false);
+  check('detail paid button is live', page.getElementById('skill-action').className, 'btn btn-paypal');
+  check('detail paid button href', page.getElementById('skill-action').href, 'https://paypal.me/dougmcdoald87/29');
+  check('detail paid button label', page.getElementById('skill-action').textContent, 'Buy via PayPal');
   check('detail document title', page.title, 'Code Review — The Agent Register');
   check('detail colophon place', page.getElementById('colophon-place').textContent, 'Arbroath, Angus DD11 4AX, Scotland');
 
