@@ -7,19 +7,29 @@
 <meta name="description" content="A single entry from The Agent Register of AI agent skills.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
+<script>
+  // Dark is the register's chassis, not a preference to be negotiated. An earlier
+  // version deferred to prefers-color-scheme and rendered light on any machine set
+  // to light - which produced the generic light SaaS look this design exists to
+  // avoid. The toggle is how you choose light; the default is not up for vote.
+  (function () {
+    try {
+      if (localStorage.getItem('register-theme') === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    } catch (e) { /* private mode - dark is the default anyway */ }
+  })();
+</script>
+<script src="theme.js" defer></script>
 </head>
 <body>
 
 <header class="masthead">
   <div class="wrap masthead-inner">
     <a class="wordmark" href="index.html">
-      <svg class="wordmark-mark" viewBox="0 0 40 40" aria-hidden="true">
-        <circle cx="20" cy="20" r="18.5" fill="none" stroke="#9a1b16" stroke-width="1.4"/>
-        <circle cx="20" cy="20" r="14" fill="none" stroke="#9a1b16" stroke-width="0.7" opacity="0.55"/>
-        <path d="M13 20.4l4.6 4.6L27 15.6" fill="none" stroke="#9a1b16" stroke-width="2.1" stroke-linecap="square"/>
-      </svg>
+      <span class="wordmark-mark" aria-hidden="true">R</span>
       <span>
         <span class="wordmark-text">The Agent Register</span>
         <span class="wordmark-sub" id="wordmark-issue">Issue 01</span>
@@ -30,6 +40,8 @@
       <a href="about.html">About</a>
       
       <a href="submit.html">Submit a skill</a>
+    <button class="theme-toggle" id="theme-toggle" type="button"
+              aria-label="Switch between dark and light" title="Switch theme">◐</button>
     </nav>
   </div>
 </header>
@@ -52,6 +64,17 @@
 
   <section class="spec" id="skill-spec" hidden>
     <dl id="spec-rows"></dl>
+  </section>
+
+  <section class="proof" id="skill-proof" hidden>
+    <h3 class="proof-head"><span class="proof-seal">Proved</span> How this was tested</h3>
+    <p class="proof-claim" id="proof-claim"></p>
+    <dl id="proof-rows"></dl>
+    <ol class="proof-repro">
+      <li><span class="proof-step">Run</span> <code id="proof-cmd"></code></li>
+      <li><span class="proof-step">Reproduce</span> <span id="proof-repro-text"></span></li>
+    </ol>
+    <p class="proof-foot" id="proof-foot"></p>
   </section>
 
   <section class="install" id="skill-install" hidden>
@@ -207,6 +230,12 @@ function renderSpec(skill, config) {
   if (skill.attribution) {
     entries.push(['Built on', skill.attribution]);
   }
+  if (skill.premium) {
+    entries.splice(5, 0, ['Premium', 'Ships more than prose — scripts, references and a worked example']);
+  }
+  if (skill.proof) {
+    entries.splice(5, 0, ['Proved', 'Run by the Register — the run and its result are recorded below']);
+  }
   entries.forEach(function (pair) {
     var row = document.createElement('div');
     row.className = 'spec-row';
@@ -225,6 +254,36 @@ function renderSpec(skill, config) {
   });
 }
 
+function renderProof(skill) {
+  var panel = document.getElementById('skill-proof');
+  var p = skill.proof;
+  if (!p) { panel.hidden = true; return; }
+
+  panel.hidden = false;
+  document.getElementById('proof-claim').textContent = p.result || '';
+  document.getElementById('proof-cmd').textContent = p.command || '';
+  document.getElementById('proof-repro-text').textContent = p.reproduce || '';
+  document.getElementById('proof-foot').textContent =
+    'Tested on ' + (p.testedOn || 'an unknown setup') + ' · verified ' + (p.verifiedAt || '—') +
+    ' by ' + (p.verifiedBy || 'the Register') + '.';
+
+  var rows = document.getElementById('proof-rows');
+  rows.innerHTML = '';
+  [['Result', p.result], ['Environment', p.verifiedOn], ['Verified', p.verifiedAt], ['By', p.verifiedBy]]
+    .forEach(function (pair) {
+      if (!pair[1]) return;
+      var row = document.createElement('div');
+      row.className = 'spec-row';
+      var dt = document.createElement('dt');
+      dt.textContent = pair[0];
+      var dd = document.createElement('dd');
+      dd.textContent = pair[1];
+      row.appendChild(dt);
+      row.appendChild(dd);
+      rows.appendChild(row);
+    });
+}
+
 function showMissing() {
   document.title = 'No such entry \u2014 The Agent Register';
   document.getElementById('missing').hidden = false;
@@ -239,7 +298,7 @@ fetch('skills.json')
     applyLocale(data.marketplace);
     var id = requestedId();
     var match = (data.skills || []).filter(function (s) { return s.id === id; })[0];
-    if (match) { showSkill(match, data.marketplace); renderSpec(match, data.marketplace); } else showMissing();
+    if (match) { showSkill(match, data.marketplace); renderSpec(match, data.marketplace); renderProof(match); } else showMissing();
   })
   .catch(function (err) {
     showMissing();

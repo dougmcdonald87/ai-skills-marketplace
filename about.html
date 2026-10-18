@@ -7,19 +7,29 @@
 <meta name="description" content="Who runs The Agent Register, how an entry gets listed, and how payment works. Published from Arbroath, Angus.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
+<script>
+  // Dark is the register's chassis, not a preference to be negotiated. An earlier
+  // version deferred to prefers-color-scheme and rendered light on any machine set
+  // to light - which produced the generic light SaaS look this design exists to
+  // avoid. The toggle is how you choose light; the default is not up for vote.
+  (function () {
+    try {
+      if (localStorage.getItem('register-theme') === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    } catch (e) { /* private mode - dark is the default anyway */ }
+  })();
+</script>
+<script src="theme.js" defer></script>
 </head>
 <body>
 
 <header class="masthead">
   <div class="wrap masthead-inner">
     <a class="wordmark" href="index.html">
-      <svg class="wordmark-mark" viewBox="0 0 40 40" aria-hidden="true">
-        <circle cx="20" cy="20" r="18.5" fill="none" stroke="#9a1b16" stroke-width="1.4"/>
-        <circle cx="20" cy="20" r="14" fill="none" stroke="#9a1b16" stroke-width="0.7" opacity="0.55"/>
-        <path d="M13 20.4l4.6 4.6L27 15.6" fill="none" stroke="#9a1b16" stroke-width="2.1" stroke-linecap="square"/>
-      </svg>
+      <span class="wordmark-mark" aria-hidden="true">R</span>
       <span>
         <span class="wordmark-text">The Agent Register</span>
         <span class="wordmark-sub" id="wordmark-issue">Issue 01</span>
@@ -29,6 +39,8 @@
       <a href="index.html">Catalogue</a>
       <a href="about.html" aria-current="page">About</a>
       <a href="submit.html">Submit a skill</a>
+    <button class="theme-toggle" id="theme-toggle" type="button"
+              aria-label="Switch between dark and light" title="Switch theme">◐</button>
     </nav>
   </div>
 </header>
@@ -50,6 +62,10 @@
       <div class="fact">
         <dt>Payment</dt>
         <dd>PayPal only. One-off, no subscription, no account to create.</dd>
+      </div>
+      <div class="fact">
+        <dt>Contact</dt>
+        <dd>dottyecho1@gmail.com &mdash; the register&rsquo;s own mailbox. A person reads it.</dd>
       </div>
       <div class="fact">
         <dt>Entries</dt>
@@ -78,7 +94,7 @@
       <div class="buy-box">
         <p class="place" id="about-place">Arbroath, Angus DD11 4AX, Scotland</p>
         <p style="font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin-bottom:8px">Contact</p>
-        <a class="btn btn-plain" href="mailto:dougmoug@gmail.com">dougmoug@gmail.com</a>
+        <a class="btn btn-plain" href="mailto:dottyecho1@gmail.com">dottyecho1@gmail.com</a>
       </div>
     </div>
   </section>

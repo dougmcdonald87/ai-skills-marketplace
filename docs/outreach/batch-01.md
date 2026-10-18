@@ -4,7 +4,7 @@ Six creators from `.scratch/creator-outreach-list.md` (29 verified, licences rea
 repository's own licence file, 0 dead links). Chosen for a published email contact, a **category the
 register has no supply in**, and no existing monetisation of that skill.
 
-**Before sending:** set reply-to to `dougmoug@gmail.com`. That is the address the site publishes for
+**Before sending:** set reply-to to `dottyecho1@gmail.com`. That is the address the site publishes for
 submissions, so replies must land there.
 
 ---

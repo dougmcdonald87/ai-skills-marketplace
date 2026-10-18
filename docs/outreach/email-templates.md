@@ -21,8 +21,8 @@ one-to-one, names a specific skill the creator actually published, and asks for 
    PayPal.me. Say so, because most creators assume marketplaces take a cut.
 5. **Make "no" cheap.** One line that makes not replying a fine outcome.
 6. **Reply-to must be the address on the site.** The site says submissions go to
-   `dougmoug@gmail.com`, so that is the reply-to. If you send from the house account
-   (`dottyecho1@gmail.com`), set reply-to explicitly or replies will land in the wrong inbox.
+   `dottyecho1@gmail.com`, so that is the reply-to. Outreach is sent from that same house
+   mailbox, so replies land somewhere that is actually read rather than in a black hole.
 7. **British English.** Catalogue, licence, organisation, colour, one-off.
 
 ---

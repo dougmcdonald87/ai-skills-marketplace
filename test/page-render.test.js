@@ -235,8 +235,13 @@ async function main() {
   // ---------- static source checks: the UK units must not regress ----------
   // Strip CSS before the spelling sweep, so "color:" as a CSS property is not
   // mistaken for American prose. Only visible copy is checked.
+  // Strip everything that is not visible prose. <script> was missing, so a technical
+  // token in inline JS (prefers-color-scheme, currentColor) read as an American
+  // spelling in the copy. The check is about what a visitor READS, so scripts and
+  // style blocks are not prose.
   const proseOnly = (src) => src
     .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
     .replace(/style="[^"]*"/gi, ' ')
     .replace(/<[^>]+>/g, ' ');
 
@@ -270,15 +275,69 @@ async function main() {
   checkTrue('about colophon mentions GBP', about.getElementById('colophon-note').textContent.indexOf('GBP') !== -1);
 
   // The contact address must render as typed, not shouted by text-transform.
+  // The address is read from skills.json, never hardcoded here. It used to be
+  // written out literally in these three checks, which meant changing the
+  // register's contact address broke the suite and the only fix was to paste
+  // the new address into the test. skills.json is the single source of truth;
+  // a test that duplicates a value will drift from it.
   const aboutSrc = fs.readFileSync(path.join(ROOT, 'about.html'), 'utf8');
-  check('about email is lowercase in the markup', aboutSrc.indexOf('>dougmoug@gmail.com<') !== -1, true);
+  const reviewEmail = config.reviewEmail;
+  checkTrue('reviewEmail is set in skills.json', typeof reviewEmail === 'string' && reviewEmail.indexOf('@') !== -1);
+  check('about email is lowercase in the markup', aboutSrc.indexOf('>' + reviewEmail + '<') !== -1, true);
   check('about email button opts out of uppercase', aboutSrc.indexOf('btn btn-plain') !== -1, true);
-  check('about email href is a mailto', aboutSrc.indexOf('href="mailto:dougmoug@gmail.com"') !== -1, true);
+  check('about email href is a mailto', aboutSrc.indexOf('href="mailto:' + reviewEmail + '"') !== -1, true);
+  check('about email matches the register address', aboutSrc.indexOf(reviewEmail) !== -1, true);
 
   // The free/paid radio labels must not inherit the uppercase form-label style.
   // ".form label" outranks ".choice-opt", so the specific selector is required.
   check('choice options opt out of uppercase', cssSrc.indexOf('.form .choice-opt') !== -1, true);
   check('choice options set text-transform none', /\.form \.choice-opt \{[\s\S]*?text-transform: none;/.test(cssSrc), true);
+
+  // ---- Premium and proved -------------------------------------------------
+  // "Worth the money" is enforced, not asserted. Every paid entry must ship at
+  // least one thing that is not prose and must carry a recorded run. Free entries
+  // are exempt; claiming premium on a free entry would be a lie in the other
+  // direction, so that is refused too.
+  const paid = skills.skills.filter(function (s) { return !s.free && Number(s.price) > 0; });
+  checkTrue('there are paid entries to check', paid.length > 0);
+
+  paid.forEach(function (s) {
+    const tag = s.name;
+    checkTrue(tag + ' claims premium', s.premium === true);
+    checkTrue(tag + ' ships a list', Array.isArray(s.ships) && s.ships.length > 0);
+    checkTrue(
+      tag + ' ships something that is not prose',
+      (s.ships || []).some(function (item) {
+        return !/\.(md|txt)$/i.test(String(item).trim());
+      })
+    );
+    checkTrue(tag + ' carries proof', !!s.proof && typeof s.proof === 'object');
+    ['testedOn', 'command', 'result', 'reproduce', 'verifiedAt', 'verifiedBy'].forEach(function (key) {
+      checkTrue(tag + ' proof.' + key + ' is filled in', !!(s.proof && String(s.proof[key] || '').trim()));
+    });
+    checkTrue(
+      tag + ' proof date is a real date',
+      /^\d{4}-\d{2}-\d{2}$/.test(String((s.proof || {}).verifiedAt || ''))
+    );
+  });
+
+  // The proof text must name something that was actually run, not just assert it works.
+  paid.forEach(function (s) {
+    checkTrue(
+      s.name + ' proof names a command',
+      /\S/.test(String((s.proof || {}).command || '')) &&
+        String(s.proof.command).indexOf(' ') !== -1
+    );
+    checkTrue(
+      s.name + ' proof says how to reproduce it',
+      String((s.proof || {}).reproduce || '').length > 20
+    );
+  });
+
+  skills.skills.filter(function (s) { return s.free; }).forEach(function (s) {
+    checkTrue(s.name + ' (free) does not claim premium', !s.premium);
+    checkTrue(s.name + ' (free) does not carry proof', !s.proof);
+  });
 
   // Every page must link to the other three, or a visitor can get stranded.
   pages.forEach(function (file) {
@@ -295,38 +354,77 @@ async function main() {
 
   const first = findEntry(index, 'skill-001');
   checkTrue('index entry 001 exists', first);
-  check('index entry number', first.children[0].textContent, 'No. 001');
-  const firstBody = first.children[1];
-  check('index entry name', firstBody.children[0].children[0].textContent, 'Code Review');
-  check('index entry link', firstBody.children[0].children[0].href, 'skill-page.html?id=skill-001');
-  check('index entry description', firstBody.children[1].textContent, skills.skills[0].desc);
-  check('index entry price is GBP', first.children[2].children[0].textContent, '£29');
 
-  const meta = firstBody.children.filter(function (c) {
-    return String(c.className).indexOf('entry-meta') !== -1;
-  })[0];
+  // Located by class, not by child index. Index-based structural assertions break
+  // every time the layout changes for a good reason, and then get "fixed" by
+  // editing the number rather than by fixing the code. Two brittle assertions
+  // (a hardcoded email and a hardcoded spec-row count) already bit this suite.
+  const pick = function (el, cls) {
+    return el.children.filter(function (c) {
+      return String(c.className).indexOf(cls) !== -1;
+    })[0];
+  };
+  const pickAll = function (el, cls) {
+    return el.children.filter(function (c) {
+      return String(c.className).indexOf(cls) !== -1;
+    });
+  };
+
+  const plate = pick(first, 'plate');
+  checkTrue('index entry has a monogram plate', !!plate);
+  check('index entry number is inside the plate', pick(plate, 'entry-no').textContent, 'No. 001');
+  check('index monogram is two letters', plate.children[0].textContent, 'CR');
+
+  const firstBody = pick(first, 'entry-body');
+  checkTrue('index entry has a body', !!firstBody);
+  check('index entry name', pick(firstBody, 'entry-name').children[0].textContent, 'Code Review');
+  check('index entry link', pick(firstBody, 'entry-name').children[0].href, 'skill-page.html?id=skill-001');
+  check('index entry description', pick(firstBody, 'entry-desc').textContent, skills.skills[0].desc);
+
+  const buy = pick(first, 'entry-buy');
+  checkTrue('index entry has a price column', !!buy);
+  check('index entry price is GBP', pick(buy, 'price').textContent, '£29');
+
+  // The proof strip is the design's anchor. It must appear in the catalogue,
+  // carrying the command that was actually run.
+  const strip = pick(firstBody, 'proof-strip');
+  checkTrue('index paid entry shows a proof strip', !!strip);
+  checkTrue(
+    'proof strip carries the command',
+    !!pick(strip, 'proof-cmd') && pick(strip, 'proof-cmd').textContent === skills.skills[0].proof.command
+  );
+  checkTrue(
+    'proof strip carries the result',
+    !!pick(strip, 'proof-out') && pick(strip, 'proof-out').textContent === skills.skills[0].proof.result
+  );
+  checkTrue('proof strip names the date', strip.textContent.indexOf(skills.skills[0].proof.verifiedAt) !== -1);
+
+  // A free entry must not borrow the paid entries' proof strip.
+  const freeEntry = findEntry(index, 'skill-002');
+  const freeBody = pick(freeEntry, 'entry-body');
+  check('index free entry has no proof strip', pick(freeBody, 'proof-strip'), undefined);
+
+  const meta = pick(firstBody, 'entry-meta');
   checkTrue('index entry has a meta row', !!meta);
   const metaText = meta.children.map(function (c) { return c.textContent; }).join(' | ');
   checkTrue('index entry meta has category', metaText.indexOf('Engineering') !== -1);
   checkTrue('index entry meta has verified', metaText.indexOf('Verified') !== -1);
   checkTrue('index entry meta has publisher', metaText.indexOf('The Register') !== -1);
 
-  const includesText = firstBody.children.filter(function (c) {
-    return String(c.className).indexOf('entry-includes') !== -1;
-  })[0];
+  const includesText = pick(firstBody, 'entry-includes');
   checkTrue('index paid entry states what you get', !!includesText);
   checkTrue('index includes mentions the bundle', includesText.textContent.indexOf('separate runnable skills') !== -1);
 
-  const firstBtn = first.children[2].children[1];
+  const firstBtn = pick(buy, 'btn-paypal');
   check('index paid button is a paypal button', firstBtn.className, 'btn btn-paypal');
   check('index paid button label', firstBtn.textContent, 'Buy via PayPal');
   check('index paid button uses the real handle', firstBtn.href, 'https://paypal.me/dougmcdoald87/29');
   check('index paid button is not aria-disabled', firstBtn.getAttribute('aria-disabled'), null);
 
-  const freeEntry = findEntry(index, 'skill-002');
-  check('index free entry price', freeEntry.children[2].children[0].textContent, 'Free');
-  check('index free entry action', freeEntry.children[2].children[1].textContent, 'Install from GitHub');
-  check('index free entry href', freeEntry.children[2].children[1].href, skills.skills[1].github);
+  const freeBuy = pick(freeEntry, 'entry-buy');
+  check('index free entry price', pick(freeBuy, 'price').textContent, 'Free');
+  check('index free entry action', pick(freeBuy, 'btn').textContent, 'Install from GitHub');
+  check('index free entry href', pick(freeBuy, 'btn').href, skills.skills[1].github);
 
   const filterButtons = index.getElementById('filters').children;
   check('index filter count', filterButtons.length, 3);
@@ -418,10 +516,36 @@ async function main() {
   check('detail spec is shown', page.getElementById('skill-spec').hidden, false);
   check('detail install section is shown', page.getElementById('skill-install').hidden, false);
   const specRows = page.getElementById('spec-rows').children;
-  check('detail spec row count', specRows.length, 11);
+  // Not a hardcoded row count. Rows are conditional on what the entry actually
+  // carries (includes, attribution, premium, proof), so a magic number here just
+  // breaks every time an entry gains a field. Assert the rows that matter exist.
+  checkTrue('detail spec has rows', specRows.length >= 9);
   const specText = specRows.map(function (r) {
     return r.children[0].textContent + ': ' + r.children[1].textContent;
   }).join(' | ');
+  // A paid entry must say, in its own spec sheet, that it is premium and proved.
+  checkTrue('detail spec says Premium', specText.indexOf('Premium:') !== -1);
+  checkTrue('detail spec says Proved', specText.indexOf('Proved:') !== -1);
+  checkTrue('detail spec says What you get', specText.indexOf('What you get:') !== -1);
+
+  // The proof panel itself, not just the word in the spec sheet. Read the child
+  // elements directly: this harness's DOM shim does not aggregate descendant
+  // textContent, so proofPanel.textContent is always empty.
+  const proofPanel = page.getElementById('skill-proof');
+  check('detail proof panel is shown on a paid entry', proofPanel.hidden, false);
+  const paidSkill = skills.skills[0];
+  check('proof claim carries the result', page.getElementById('proof-claim').textContent, paidSkill.proof.result);
+  check('proof step carries the command', page.getElementById('proof-cmd').textContent, paidSkill.proof.command);
+  check('proof step carries how to reproduce', page.getElementById('proof-repro-text').textContent, paidSkill.proof.reproduce);
+  const foot = page.getElementById('proof-foot').textContent;
+  checkTrue('proof foot names the date', foot.indexOf(paidSkill.proof.verifiedAt) !== -1);
+  checkTrue('proof foot names the verifier', foot.indexOf(paidSkill.proof.verifiedBy) !== -1);
+  checkTrue('proof foot names what was tested on', foot.indexOf(paidSkill.proof.testedOn) !== -1);
+  const proofRows = page.getElementById('proof-rows').children.map(function (r) {
+    return r.children[0].textContent + ': ' + r.children[1].textContent;
+  }).join(' | ');
+  checkTrue('proof rows include the result', proofRows.indexOf(paidSkill.proof.result) !== -1);
+  checkTrue('proof rows include the environment', proofRows.indexOf(paidSkill.proof.verifiedOn) !== -1);
   checkTrue('spec has entry number', specText.indexOf('No. 001') !== -1);
   checkTrue('spec has format', specText.indexOf('Markdown skill (SKILL.md)') !== -1);
   checkTrue('spec has publisher', specText.indexOf('The Register') !== -1);
@@ -440,6 +564,10 @@ async function main() {
   }).join(' | ');
   checkTrue('free spec states no payment', freeSpecText.indexOf('Payment: None') !== -1);
   checkTrue('free spec price is Free', freeSpecText.indexOf('Price: Free') !== -1);
+  // A free entry has nothing to prove and must not borrow the paid entries' panel.
+  check('free entry shows no proof panel', freeSpec.getElementById('skill-proof').hidden, true);
+  checkTrue('free spec makes no premium claim', freeSpecText.indexOf('Premium:') === -1);
+  checkTrue('free spec makes no proved claim', freeSpecText.indexOf('Proved:') === -1);
   checkTrue('free spec has no what-you-get row', freeSpecText.indexOf('What you get:') === -1);
   checkTrue('free spec names the publisher', freeSpecText.indexOf('Publisher: Matt Pocock') !== -1);
 
@@ -513,7 +641,7 @@ async function main() {
     setField('f-github', 'https://github.com/someone/skill');
     fire();
     check('accepts a free listing with github only', submitDoc.getElementById('form-status').className, 'form-status ok');
-    check('mailto targets review address', submitWindow.location.href.indexOf('mailto:dougmoug@gmail.com') === 0, true);
+    check('mailto targets review address', submitWindow.location.href.indexOf('mailto:' + config.reviewEmail) === 0, true);
     const freeDecoded = decodeURIComponent(submitWindow.location.href);
     checkTrue('free mailto says the type', freeDecoded.indexOf('Listing type: FREE') !== -1);
     checkTrue('free mailto says price is Free', freeDecoded.indexOf('Price (GBP): Free') !== -1);

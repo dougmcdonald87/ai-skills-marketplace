@@ -7,19 +7,29 @@
 <meta name="description" content="A register of AI agent skills that run on any platform. Buy once, install anywhere. Payment by PayPal, prices in GBP.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <link rel="stylesheet" href="styles.css">
+<script>
+  // Dark is the register's chassis, not a preference to be negotiated. An earlier
+  // version deferred to prefers-color-scheme and rendered light on any machine set
+  // to light - which produced the generic light SaaS look this design exists to
+  // avoid. The toggle is how you choose light; the default is not up for vote.
+  (function () {
+    try {
+      if (localStorage.getItem('register-theme') === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    } catch (e) { /* private mode - dark is the default anyway */ }
+  })();
+</script>
+<script src="theme.js" defer></script>
 </head>
 <body>
 
 <header class="masthead">
   <div class="wrap masthead-inner">
     <a class="wordmark" href="index.html">
-      <svg class="wordmark-mark" viewBox="0 0 40 40" aria-hidden="true">
-        <circle cx="20" cy="20" r="18.5" fill="none" stroke="#9a1b16" stroke-width="1.4"/>
-        <circle cx="20" cy="20" r="14" fill="none" stroke="#9a1b16" stroke-width="0.7" opacity="0.55"/>
-        <path d="M13 20.4l4.6 4.6L27 15.6" fill="none" stroke="#9a1b16" stroke-width="2.1" stroke-linecap="square"/>
-      </svg>
+      <span class="wordmark-mark" aria-hidden="true">R</span>
       <span>
         <span class="wordmark-text">The Agent Register</span>
         <span class="wordmark-sub" id="wordmark-issue">Issue 01</span>
@@ -29,12 +39,15 @@
       <a href="index.html" aria-current="page">Catalogue</a>
       <a href="about.html">About</a>
       <a href="submit.html">Submit a skill</a>
+      <button class="theme-toggle" id="theme-toggle" type="button"
+              aria-label="Switch between dark and light" title="Switch theme">â—</button>
     </nav>
   </div>
 </header>
 
 <main>
   <section class="wrap hero">
+    <div class="hero-grid">
     <div>
       <p class="eyebrow" style="margin-bottom:18px">Skills for every AI agent</p>
       <h1>Buy a skill once.<br>Use it <em>everywhere</em>.</h1>
@@ -56,6 +69,7 @@
         <dd id="hero-place">Arbroath, Angus DD11 4AX, Scotland</dd>
       </div>
     </dl>
+    </div>
   </section>
 
   <section class="wrap section" aria-labelledby="catalogue-heading">
@@ -144,9 +158,19 @@ function buildEntry(skill, config) {
   entry.className = 'entry';
   entry.setAttribute('data-skill-id', skill.id);
 
+  // Monogram plate. Each entry gets a specimen-style tile so the catalogue reads
+  // as objects on a shelf rather than rows of text. The entry number lives inside
+  // the plate so it stays visually attached to the thing it numbers.
+  var plate = document.createElement('div');
+  plate.className = 'plate';
+  var monogram = document.createElement('span');
+  monogram.textContent = initials(skill.name);
+  plate.appendChild(monogram);
+
   var no = document.createElement('p');
   no.className = 'entry-no';
   no.textContent = 'No. ' + skill.no;
+  plate.appendChild(no);
 
   var body = document.createElement('div');
   body.className = 'entry-body';
@@ -207,6 +231,8 @@ function buildEntry(skill, config) {
   body.appendChild(name);
   body.appendChild(desc);
   if (includes) body.appendChild(includes);
+  var strip = buildProofStrip(skill);
+  if (strip) body.appendChild(strip);
   body.appendChild(meta);
 
   var buy = document.createElement('div');
@@ -238,10 +264,46 @@ function buildEntry(skill, config) {
   }
   buy.appendChild(btn);
 
-  entry.appendChild(no);
+  entry.appendChild(plate);
   entry.appendChild(body);
   entry.appendChild(buy);
   return entry;
+}
+
+// The proof strip. This is the anchor of the whole design: a paid entry shows the
+// command that was run and what it returned, right in the catalogue. No other
+// skills directory shows its working, which is exactly the point.
+function buildProofStrip(skill) {
+  if (!skill.proof) return null;
+  var p = skill.proof;
+  var strip = document.createElement('div');
+  strip.className = 'proof-strip';
+
+  var head = document.createElement('p');
+  head.className = 'proof-strip-head';
+  head.textContent = 'Proved ' + (p.verifiedAt || '');
+  strip.appendChild(head);
+
+  if (p.command) {
+    var cmd = document.createElement('code');
+    cmd.className = 'proof-cmd';
+    cmd.textContent = p.command;
+    strip.appendChild(cmd);
+  }
+  if (p.result) {
+    var out = document.createElement('p');
+    out.className = 'proof-out';
+    out.textContent = p.result;
+    strip.appendChild(out);
+  }
+  return strip;
+}
+
+function initials(name) {
+  var words = String(name).trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return '?';
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
 }
 
 function matches(skill, query, category) {

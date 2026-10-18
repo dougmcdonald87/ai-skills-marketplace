@@ -6,7 +6,7 @@
     "currency": "GBP",
     "place": "Arbroath, Angus DD11 4AX, Scotland",
     "paypalBase": "https://paypal.me/dougmcdoald87",
-    "reviewEmail": "dougmoug@gmail.com"
+    "reviewEmail": "dottyecho1@gmail.com"
   },
   "skills": [
     {
@@ -24,7 +24,26 @@
       "format": "Markdown skill (SKILL.md)",
       "licence": "MIT",
       "attribution": "Built on the MIT-licensed review flow by Matt Pocock",
-      "includes": "Both review passes as separate runnable skills, the standards checklist, and the fixed-point workflow. Updates for a year."
+      "includes": "Both review passes as separate runnable skills, the standards checklist, and the fixed-point workflow. Updates for a year.",
+      "premium": true,
+      "ships": [
+        "SKILL-standards.md - the Standards axis, standalone",
+        "SKILL-spec.md - the Spec axis, standalone",
+        "run-review.ps1 - pins the fixed point, proves the diff is non-empty, finds the standards and spec sources, emits both briefs",
+        "standards-checklist.md - the 12 Fowler smells as a printable checklist",
+        "verify-pack.ps1 - checks the pack installed correctly",
+        "worked-example/ - a real two-axis report and the run that produced it"
+      ],
+      "proof": {
+        "testedOn": "The Register's own repository, 2 commits, 4 files",
+        "command": "powershell -File run-review.ps1 -FixedPoint HEAD~2",
+        "result": "The Spec axis caught a live defect. Three assertions in the render test still asserted the old contact address while the site had already moved to a new one - 166 of 169 checks were failing. Rewritten to read the address from skills.json instead of hardcoding it; 171 of 171 now pass, and two mutation tests confirm the new checks fail when the address is wrong.",
+        "reproduce": "Run the runner against any ref, hand brief-standards.md and brief-spec.md to two agents in parallel, paste both reports into REPORT.md. The report skeleton refuses to merge the axes.",
+        "verifiedOn": "Windows 11, PowerShell 5.1, git 2.x",
+        "verifiedAt": "2026-10-18",
+        "verifiedBy": "The Register"
+      },
+      "packFolder": "code-review"
     },
     {
       "id": "skill-002",
@@ -71,7 +90,25 @@
       "format": "Markdown skill (SKILL.md)",
       "licence": "MIT",
       "attribution": "Built on the MIT-licensed prototype skill by Matt Pocock",
-      "includes": "Both branches of the prototype skill - the logic harness and the interface variations - and the throwaway rules that stop it turning into production code. Updates for a year."
+      "includes": "Both branches of the prototype skill - the logic harness and the interface variations - and the throwaway rules that stop it turning into production code. Updates for a year.",
+      "premium": true,
+      "ships": [
+        "SKILL-logic.md - the logic-harness branch, standalone",
+        "SKILL-ui.md - the interface-variations branch, standalone",
+        "new-prototype.ps1 - scaffolds a prototype with the one question written into it",
+        "verify-throwaway.ps1 - fails if anything outside the prototype folder imports it",
+        "worked-example/ - a real scaffold, and the guard firing on a real escape"
+      ],
+      "proof": {
+        "testedOn": "A scratch repository with a src/ folder and one production file",
+        "command": "new-prototype.ps1 -Name pricing-tiers -Question 'Does a three-tier card grid fit 390px without a carousel?'",
+        "result": "Scaffolded three files with the question written into THROWAWAY.md, so the prototype cannot sprawl without someone noticing. The guard was then tested both ways: with a production import of the prototype planted it exited 1 and named the offending file and line; with the import removed it exited 0. A counting bug in the guard's own output was found by running it and fixed.",
+        "reproduce": "Scaffold a prototype, add an import of it from src/, run verify-throwaway.ps1 and read the exit code. Then remove the import and run it again.",
+        "verifiedOn": "Windows 11, PowerShell 5.1",
+        "verifiedAt": "2026-10-18",
+        "verifiedBy": "The Register"
+      },
+      "packFolder": "prototype"
     }
   ]
 }

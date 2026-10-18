@@ -1,0 +1,13 @@
+# Evidence from local runs, not part of the site. The copy that belongs in the
+# product lives in the packs folder and is shipped with the pack, not published
+# here - these runs contain this repository's own diffs and paths.
+review-reports/
+
+# Node
+node_modules/
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
