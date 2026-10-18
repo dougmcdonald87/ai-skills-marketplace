@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill &mdash; AI Agent Skills Marketplace</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #111; line-height: 1.5; }
+.container { max-width: 720px; margin: 0 auto; padding: 24px; }
+header { margin-bottom: 32px; }
+h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+p.sub { color: #555; font-size: 14px; }
+.skill-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
+.skill-card h3 { font-size: 18px; margin-bottom: 4px; }
+.skill-card p.desc { font-size: 14px; color: #444; margin-bottom: 12px; }
+.skill-card .meta { font-size: 12px; color: #777; margin-bottom: 12px; display: flex; gap: 12px; }
+.skill-card .price { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.paypal-btn { display: inline-block; background: #0070ba; color: #fff; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; }
+.paypal-btn:hover { background: #005ea5; }
+.free-btn { display: inline-block; background: #e8e8e8; color: #111; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; }
+.free-btn:hover { background: #d8d8d8; }
+.back { display: inline-block; margin-top: 20px; color: #0070ba; text-decoration: none; font-size: 14px; }
+.back:hover { text-decoration: underline; }
+footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>Skill</h1>
+<p class="sub">Platform-agnostic AI agent skill. PayPal only.</p>
+</header>
+
+<div class="skill-card">
+<h3 id="skill-name">Skill Name</h3>
+<p class="desc" id="skill-desc">Skill description goes here.</p>
+<div class="meta"><span id="skill-platform">Universal platform</span><span id="skill-category">Engineering</span></div>
+<div class="price" id="skill-price">$0</div>
+<a id="skill-action" class="free-btn" href="#" target="_blank">Install from GitHub</a>
+</div>
+
+<a href="index.html" class="back">&larr; Back to marketplace</a>
+
+<footer>
+<p>AI Agent Skills Marketplace &mdash; Platform-agnostic. Works with every AI agent. PayPal payments only.</p>
+</footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,52 @@
+{
+  "skills": [
+    {
+      "id": "skill-001",
+      "name": "Code Review",
+      "desc": "Two-axis review (Standards + Spec) of your diff. Works with any AI agent plugin.",
+      "platform": "Universal platform",
+      "category": "Engineering",
+      "price": 29,
+      "paypal": "https://paypal.me/yourname/29",
+      "github": null,
+      "free": false,
+      "verified": true
+    },
+    {
+      "id": "skill-002",
+      "name": "Grill With Docs",
+      "desc": "Relentless interview that sharpens your plan and leaves a paper trail (ADRs + glossary).",
+      "platform": "Universal platform",
+      "category": "Productivity",
+      "price": 0,
+      "paypal": null,
+      "github": "https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs",
+      "free": true,
+      "verified": true
+    },
+    {
+      "id": "skill-003",
+      "name": "TDD",
+      "desc": "Test-first development loop. One red-green slice at a time.",
+      "platform": "Universal platform",
+      "category": "Engineering",
+      "price": 0,
+      "paypal": null,
+      "github": "https://github.com/mattpocock/skills/tree/main/skills/engineering/tdd",
+      "free": true,
+      "verified": true
+    },
+    {
+      "id": "skill-004",
+      "name": "Prototype",
+      "desc": "Throwaway code that answers one design question. Logic or UI variant.",
+      "platform": "Universal platform",
+      "category": "Productivity",
+      "price": 19,
+      "paypal": "https://paypal.me/yourname/19",
+      "github": null,
+      "free": false,
+      "verified": true
+    }
+  ]
+}

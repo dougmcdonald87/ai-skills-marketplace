@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agent Skills Marketplace</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #111; line-height: 1.5; }
+.container { max-width: 720px; margin: 0 auto; padding: 24px; }
+header { margin-bottom: 32px; }
+h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+p.sub { color: #555; font-size: 14px; }
+.skills-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 32px; }
+.skill-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
+.skill-card h3 { font-size: 18px; margin-bottom: 4px; }
+.skill-card p.desc { font-size: 14px; color: #444; margin-bottom: 12px; }
+.skill-card .meta { font-size: 12px; color: #777; margin-bottom: 12px; display: flex; gap: 12px; }
+.skill-card .price { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.paypal-btn { display: inline-block; background: #0070ba; color: #fff; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; }
+.paypal-btn:hover { background: #005ea5; }
+.free-btn { display: inline-block; background: #e8e8e8; color: #111; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; }
+.free-btn:hover { background: #d8d8d8; }
+footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>AI Agent Skills Marketplace</h1>
+<p class="sub">Skills for Cursor, Claude Code, opencode, Continue, and every AI agent. PayPal only. No subscriptions.</p>
+</header>
+
+<div class="skills-grid">
+<div class="skill-card">
+<h3>Code Review</h3>
+<p class="desc">Two-axis review (Standards + Spec) of your diff. Works with any AI agent plugin.</p>
+<div class="meta"><span>Engineering</span><span>Universal platform</span></div>
+<div class="price">$29 one-time</div>
+<a href="https://paypal.me/yourname/29" class="paypal-btn" target="_blank">Buy via PayPal</a>
+</div>
+
+<div class="skill-card">
+<h3>Grill With Docs</h3>
+<p class="desc">Relentless interview that sharpens your plan and leaves a paper trail (ADRs + glossary).</p>
+<div class="meta"><span>Productivity</span><span>Universal platform</span></div>
+<div class="price">Free</div>
+<a href="https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs" class="free-btn" target="_blank">Install from GitHub</a>
+</div>
+
+<div class="skill-card">
+<h3>TDD</h3>
+<p class="desc">Test-first development loop. One red-green slice at a time.</p>
+<div class="meta"><span>Engineering</span><span>Universal platform</span></div>
+<div class="price">Free</div>
+<a href="https://github.com/mattpocock/skills/tree/main/skills/engineering/tdd" class="free-btn" target="_blank">Install from GitHub</a>
+</div>
+
+<div class="skill-card">
+<h3>Prototype</h3>
+<p class="desc">Throwaway code that answers one design question. Logic or UI variant.</p>
+<div class="meta"><span>Productivity</span><span>Universal platform</span></div>
+<div class="price">$19 one-time</div>
+<a href="https://paypal.me/yourname/19" class="paypal-btn" target="_blank">Buy via PayPal</a>
+</div>
+</div>
+
+<footer>
+<p>AI Agent Skills Marketplace &mdash; Platform-agnostic. Works with every AI agent. PayPal payments only.</p>
+</footer>
+</div>
+</body>
+</html>

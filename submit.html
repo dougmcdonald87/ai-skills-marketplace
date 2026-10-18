@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Submit a Skill &mdash; AI Agent Skills Marketplace</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #111; line-height: 1.5; }
+.container { max-width: 720px; margin: 0 auto; padding: 24px; }
+header { margin-bottom: 32px; }
+h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
+p.sub { color: #555; font-size: 14px; }
+form { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 24px; }
+label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; margin-top: 16px; }
+input, textarea, select { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 12px; }
+textarea { min-height: 80px; }
+.submit-btn { background: #0070ba; color: #fff; padding: 10px 24px; border: none; border-radius: 4px; font-weight: 600; font-size: 14px; cursor: pointer; width: 100%; }
+.submit-btn:hover { background: #005ea5; }
+.back { display: inline-block; margin-top: 20px; color: #0070ba; text-decoration: none; font-size: 14px; }
+.back:hover { text-decoration: underline; }
+footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>Submit a Skill</h1>
+<p class="sub">List your AI agent skill on the marketplace.</p>
+</header>
+
+<form>
+<label>Skill name</label>
+<input type="text" placeholder="e.g. Code Review Assistant" required>
+
+<label>Description</label>
+<textarea placeholder="What does this skill do?" required></textarea>
+
+<label>Platform</label>
+<select>
+<option>Universal (all AI agents)</option>
+<option>Claude Code</option>
+<option>Cursor</option>
+<option>opencode</option>
+<option>Continue</option>
+</select>
+
+<label>Category</label>
+<select>
+<option>Engineering</option>
+<option>Productivity</option>
+</select>
+
+<label>Price (USD)</label>
+<input type="number" min="0" step="0.01" placeholder="0.00" required>
+
+<label>PayPal.me link</label>
+<input type="url" placeholder="https://paypal.me/yourname" required>
+
+<label>GitHub link (free skills)</label>
+<input type="url" placeholder="https://github.com/yourname/skill">
+
+<button type="submit" class="submit-btn">Submit skill</button>
+</form>
+
+<a href="index.html" class="back">&larr; Back to marketplace</a>
+
+<footer>
+<p>AI Agent Skills Marketplace &mdash; Platform-agnostic. Works with every AI agent. PayPal payments only.</p>
+</footer>
+</div>
+</body>
+</html>
