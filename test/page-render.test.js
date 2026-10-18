@@ -254,6 +254,7 @@ async function main() {
     check('lang is en-GB in ' + file, src.indexOf('lang="en-GB"') !== -1, true);
   });
   const jsonSrc = fs.readFileSync(path.join(ROOT, 'skills.json'), 'utf8');
+  const cssSrc = fs.readFileSync(path.join(ROOT, 'styles.css'), 'utf8');
   check('no USD in skills.json', jsonSrc.indexOf('USD') === -1, true);
   check('no one-time in skills.json', jsonSrc.indexOf('one-time') === -1, true);
   check('address is DD11 4AX in skills.json', jsonSrc.indexOf('DD11 4AX') !== -1, true);
@@ -273,6 +274,11 @@ async function main() {
   check('about email is lowercase in the markup', aboutSrc.indexOf('>dougmoug@gmail.com<') !== -1, true);
   check('about email button opts out of uppercase', aboutSrc.indexOf('btn btn-plain') !== -1, true);
   check('about email href is a mailto', aboutSrc.indexOf('href="mailto:dougmoug@gmail.com"') !== -1, true);
+
+  // The free/paid radio labels must not inherit the uppercase form-label style.
+  // ".form label" outranks ".choice-opt", so the specific selector is required.
+  check('choice options opt out of uppercase', cssSrc.indexOf('.form .choice-opt') !== -1, true);
+  check('choice options set text-transform none', /\.form \.choice-opt \{[\s\S]*?text-transform: none;/.test(cssSrc), true);
 
   // Every page must link to the other three, or a visitor can get stranded.
   pages.forEach(function (file) {

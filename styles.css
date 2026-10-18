@@ -798,7 +798,7 @@ a:hover { color: var(--seal-2); }
   padding: 0 8px;
 }
 
-.choice-opt {
+.form .choice-opt {
   display: flex;
   gap: 11px;
   align-items: flex-start;
@@ -813,16 +813,16 @@ a:hover { color: var(--seal-2); }
   color: var(--ink-2);
 }
 
-.choice-opt:last-child { border-bottom: none; }
+.form .choice-opt:last-child { border-bottom: none; }
 
-.choice-opt input {
+.form .choice-opt input {
   width: auto;
   margin: 3px 0 0;
   flex: none;
   accent-color: var(--seal);
 }
 
-.choice-opt strong { color: var(--ink); font-weight: 500; display: block; }
+.form .choice-opt strong { color: var(--ink); font-weight: 500; display: block; }
 
 /* ---------- Empty state ---------- */
 
