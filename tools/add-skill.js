@@ -132,6 +132,32 @@ function main() {
         '  Proof is the run and its actual output, not a claim that it works.'
       );
     }
+    // THE HARD RULE. Doug: "we can only sell premium skills not other folks free
+    // skills they need to be worth the money or why would someone pay for something
+    // they can source themselves." He said this repeatedly and was right.
+    //
+    // If an entry has to credit another author, the skill is derived from their
+    // free open-source work. Charging for that is not worth the money to a buyer -
+    // they can source it themselves - and it is not fair to the author. Entries
+    // 001 and 004 were taken off sale for exactly this reason on 18 Oct 2026.
+    //
+    // So: attribution is allowed on free listings, refused on paid ones.
+    if (args.attribution) {
+      fail(
+        'A paid entry cannot be built on another author\'s work.\n' +
+        '  --attribution is set, which means this skill is derived from someone else\'s\n' +
+        '  free open-source work. That is a free listing: link to the source and credit\n' +
+        '  them. Only Doug\'s OWN original work can be priced.\n' +
+        '  List it free with --github, or drop --attribution if this is original.'
+      );
+    }
+    if (String(args.publisher || '').toLowerCase() !== 'the register') {
+      fail(
+        'A paid entry must be published by The Register.\n' +
+        '  Paid entries are Doug\'s own original work. Anything else is a free listing\n' +
+        '  that links to its author.'
+      );
+    }
     // Checked against the field names buildProof actually returns. This was reading
     // proof['tested'], which does not exist - the field is 'testedOn' - so
     // --proof-tested was reported missing no matter what was passed.

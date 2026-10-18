@@ -106,30 +106,30 @@
           <option>Design</option>
         </select>
 
+        <p class="form-hint" id="listing-policy">The register does not sell your work. Paid entries were withdrawn on
+          18 October 2026: charging for a repackaging of someone's free open-source skill
+          is not worth the money to a buyer, and it is not fair to whoever wrote it.
+          Everything here is listed free and links straight to you.</p>
+
         <fieldset class="choice">
           <legend>What are you listing?</legend>
           <label class="choice-opt">
             <input type="radio" name="kind" value="free" checked>
-            <span><strong>Your skills, free.</strong> The entry links to your repository. Nothing is sold.</span>
-          </label>
-          <label class="choice-opt">
-            <input type="radio" name="kind" value="paid">
-            <span><strong>A paid product.</strong> A bundle, a supported edition, or a tier that is not free today. The buyer pays you directly.</span>
+            <span><strong>Your skills, free.</strong> The entry links to your repository. Nothing is sold, and you keep all the credit.</span>
           </label>
         </fieldset>
 
         <div id="paid-fields" hidden>
           <label for="f-price">Price (GBP)</label>
-          <input type="number" id="f-price" name="price" min="0" step="0.01" placeholder="0.00" required>
+          <input type="number" id="f-price" name="price" min="0" step="0.01" placeholder="0.00">
 
           <label for="f-includes">What does the buyer get?</label>
-          <textarea id="f-includes" name="includes" placeholder="A bundle of four skills. Updates for a year. Email support if it breaks."></textarea>
-          <p class="form-hint">One line, and be specific. This is what justifies a price.</p>
+          <textarea id="f-includes" name="includes" placeholder="A bundle of four skills. Updates for a year."></textarea>
         </div>
 
         <label for="f-paypal">PayPal.me link</label>
-        <input type="url" id="f-paypal" name="paypal" placeholder="https://paypal.me/yourname">
-        <p class="form-hint">For paid listings only. You set the price, you keep the money.</p>
+        <input type="url" id="f-paypal" name="paypal" placeholder="https://paypal.me/yourname" hidden>
+        <p class="form-hint" hidden>Not used. Paid listings have been withdrawn.</p>
 
         <label for="f-github">GitHub link</label>
         <input type="url" id="f-github" name="github" placeholder="https://github.com/you/skill">
@@ -142,7 +142,7 @@
       <aside class="submit-aside">
         <h3>What happens next</h3>
         <p>Your email arrives with everything you typed. It is read by a person, not a filter.</p>
-        <p>If the skill does what the entry says, it is published with a number, a publisher and a licence. Free entries link to your repository. Paid ones get a checkout that pays you.</p>
+        <p>If the skill does what the entry says, it is published with a number, a publisher, a licence and a link to your repository. Nothing is sold on your behalf and no commission is taken.</p>
         <p>Entries are numbered in the order they are accepted, and the register keeps growing as new skills are submitted.</p>
         <p class="aside-note">No commission &middot; no exclusivity &middot; no listing fee</p>
       </aside>

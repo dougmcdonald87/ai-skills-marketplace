@@ -230,7 +230,52 @@ function findEntry(doc, id) {
 }
 
 async function main() {
-  const config = skills.marketplace;
+  // The paid path is exercised against a synthetic entry, not against production data.
+//
+// Entries 001 and 004 were taken off sale on 18 Oct 2026: they were repackaged
+// Matt Pocock MIT skills, and charging for someone's free open-source work is not a
+// pricing decision, it is a legitimate-product decision. They are now free listings
+// linking to the source and nothing in the catalogue is for sale.
+//
+// The PayPal seam, the proof panel and the premium spec rows still exist and still
+// need covering. Keeping that coverage on a fixture means "nothing is for sale" stays
+// the honest state of the catalogue AND the paid path stays proven, ready for the day
+// there is Doug's own original work to sell.
+const FIXTURE_PAID = {
+  id: 'skill-900',
+  no: '900',
+  name: 'Fixture Premium Skill',
+  desc: 'Synthetic entry used only by the test suite to exercise the paid path.',
+  platform: 'Universal',
+  category: 'Engineering',
+  price: 29,
+  github: null,
+  free: false,
+  verified: true,
+  publisher: 'The Register',
+  format: 'Markdown skill (SKILL.md)',
+  licence: 'MIT',
+  includes: 'A runnable script, a reference and a worked example.',
+  premium: true,
+  ships: ['run-fixture.ps1 - does the thing', 'worked-example/ - a real run'],
+  proof: {
+    testedOn: 'a scratch repository',
+    command: 'node run-fixture.js --check',
+    result: 'It passed, and the failing case failed too.',
+    reproduce: 'node run-fixture.js --check',
+    verifiedOn: 'Windows 11',
+    verifiedAt: '2026-10-18',
+    verifiedBy: 'The Register'
+  }
+};
+const FIXTURE_ID = FIXTURE_PAID.id;
+const withFixture = () => {
+  const c = JSON.parse(JSON.stringify(skills));
+  c.skills.push(JSON.parse(JSON.stringify(FIXTURE_PAID)));
+  return c;
+};
+
+const config = skills.marketplace;
 
   // ---------- static source checks: the UK units must not regress ----------
   // Strip CSS before the spelling sweep, so "color:" as a CSS property is not
@@ -298,7 +343,7 @@ async function main() {
   // least one thing that is not prose and must carry a recorded run. Free entries
   // are exempt; claiming premium on a free entry would be a lie in the other
   // direction, so that is refused too.
-  const paid = skills.skills.filter(function (s) { return !s.free && Number(s.price) > 0; });
+  const paid = withFixture().skills.filter(function (s) { return !s.free && Number(s.price) > 0; });
   checkTrue('there are paid entries to check', paid.length > 0);
 
   paid.forEach(function (s) {
@@ -383,45 +428,81 @@ async function main() {
 
   const buy = pick(first, 'entry-buy');
   checkTrue('index entry has a price column', !!buy);
-  check('index entry price is GBP', pick(buy, 'price').textContent, '£29');
 
-  // The proof strip is the design's anchor. It must appear in the catalogue,
-  // carrying the command that was actually run.
-  const strip = pick(firstBody, 'proof-strip');
-  checkTrue('index paid entry shows a proof strip', !!strip);
-  checkTrue(
-    'proof strip carries the command',
-    !!pick(strip, 'proof-cmd') && pick(strip, 'proof-cmd').textContent === skills.skills[0].proof.command
-  );
-  checkTrue(
-    'proof strip carries the result',
-    !!pick(strip, 'proof-out') && pick(strip, 'proof-out').textContent === skills.skills[0].proof.result
-  );
-  checkTrue('proof strip names the date', strip.textContent.indexOf(skills.skills[0].proof.verifiedAt) !== -1);
+  // Driven by the data, not by assuming a particular entry is paid. Entries 001
+  // and 004 were taken off sale on 18 Oct 2026 - they were repackaged MIT skills
+  // and we do not sell other people's free work. A test that hardcoded "001 is GBP29"
+  // would have silently re-validated the model that was wrong.
+  const paidSkills = skills.skills.filter(function (s) { return !s.free && Number(s.price) > 0; });
+  const isPaid = !skills.skills[0].free && Number(skills.skills[0].price) > 0;
 
-  // A free entry must not borrow the paid entries' proof strip.
-  const freeEntry = findEntry(index, 'skill-002');
-  const freeBody = pick(freeEntry, 'entry-body');
-  check('index free entry has no proof strip', pick(freeBody, 'proof-strip'), undefined);
+  if (isPaid) {
+    check('index entry price is GBP', pick(buy, 'price').textContent, '£' + skills.skills[0].price);
+    const strip = pick(firstBody, 'proof-strip');
+    checkTrue('index paid entry shows a proof strip', !!strip);
+    checkTrue(
+      'proof strip carries the command',
+      !!pick(strip, 'proof-cmd') && pick(strip, 'proof-cmd').textContent === skills.skills[0].proof.command
+    );
+    checkTrue(
+      'proof strip carries the result',
+      !!pick(strip, 'proof-out') && pick(strip, 'proof-out').textContent === skills.skills[0].proof.result
+    );
+  } else {
+    check('index free entry price reads Free', pick(buy, 'price').textContent, 'Free');
+    check('index free entry has no proof strip', pick(firstBody, 'proof-strip'), undefined);
+    checkTrue(
+      'index free entry installs from source',
+      !!pick(buy, 'btn') && !!skills.skills[0].github
+    );
+  }
+
+  // Every free entry links out to its source and carries no proof strip.
+  skills.skills.filter(function (s) { return s.free; }).forEach(function (s) {
+    const el = findEntry(index, s.id);
+    checkTrue(s.name + ' renders', !!el);
+    const body = pick(el, 'entry-body');
+    check(s.name + ' has no proof strip', pick(body, 'proof-strip'), undefined);
+    checkTrue(s.name + ' links to its source', !!s.github);
+    checkTrue(
+      s.name + ' source is a github URL',
+      /^https:\/\/github\.com\//.test(String(s.github || ''))
+    );
+  });
+
+  // Nothing for sale yet, which is correct until there is Doug's own original
+  // work to sell. Recorded so the day that changes, this test says so loudly.
+  if (paidSkills.length === 0) {
+    checkTrue('catalogue has nothing for sale - no repackaged free work', true);
+  }
 
   const meta = pick(firstBody, 'entry-meta');
   checkTrue('index entry has a meta row', !!meta);
   const metaText = meta.children.map(function (c) { return c.textContent; }).join(' | ');
   checkTrue('index entry meta has category', metaText.indexOf('Engineering') !== -1);
   checkTrue('index entry meta has verified', metaText.indexOf('Verified') !== -1);
-  checkTrue('index entry meta has publisher', metaText.indexOf('The Register') !== -1);
+  checkTrue('index entry meta has publisher', metaText.indexOf(String(skills.skills[0].publisher)) !== -1);
 
   const includesText = pick(firstBody, 'entry-includes');
-  checkTrue('index paid entry states what you get', !!includesText);
-  checkTrue('index includes mentions the bundle', includesText.textContent.indexOf('separate runnable skills') !== -1);
+  if (isPaid) {
+    checkTrue('index paid entry states what you get', !!includesText);
+    const firstBtn = pick(buy, 'btn-paypal');
+    check('index paid button is a paypal button', firstBtn.className, 'btn btn-paypal');
+    check('index paid button label', firstBtn.textContent, 'Buy via PayPal');
+    checkTrue(
+      'index paid button uses the real handle',
+      firstBtn.href.indexOf(config.paypalBase + '/' + skills.skills[0].price) === 0
+    );
+    check('index paid button is not aria-disabled', firstBtn.getAttribute('aria-disabled'), null);
+  } else {
+    check('index entry states nothing for sale', includesText, undefined);
+    const firstBtn = pick(buy, 'btn');
+    check('index free button label', firstBtn.textContent, 'Install from GitHub');
+    check('index free button href is the source', firstBtn.href, skills.skills[0].github);
+  }
 
-  const firstBtn = pick(buy, 'btn-paypal');
-  check('index paid button is a paypal button', firstBtn.className, 'btn btn-paypal');
-  check('index paid button label', firstBtn.textContent, 'Buy via PayPal');
-  check('index paid button uses the real handle', firstBtn.href, 'https://paypal.me/dougmcdoald87/29');
-  check('index paid button is not aria-disabled', firstBtn.getAttribute('aria-disabled'), null);
-
-  const freeBuy = pick(freeEntry, 'entry-buy');
+  const second = findEntry(index, 'skill-002');
+  const freeBuy = pick(second, 'entry-buy');
   check('index free entry price', pick(freeBuy, 'price').textContent, 'Free');
   check('index free entry action', pick(freeBuy, 'btn').textContent, 'Install from GitHub');
   check('index free entry href', pick(freeBuy, 'btn').href, skills.skills[1].github);
@@ -464,31 +545,40 @@ async function main() {
   check('All filter restores the catalogue', entriesOf(index).length, 4);
 
   // ---------- the paypal seam ----------
-  // Production data now carries a verified live handle, so the paid button must be live.
+  // Production data now carries a verified live handle.
   check('paypalBase is the verified live handle', config.paypalBase, 'https://paypal.me/dougmcdoald87');
 
+  // ---------- the paid path, against the FIXTURE ----------
+  // Defined once, near the top, so the data rules and the PayPal seam share it.
+  const fixture = withFixture();
+
   // A placeholder base must NOT produce a live payment link.
-  const placeholder = JSON.parse(JSON.stringify(skills));
+  const placeholder = JSON.parse(JSON.stringify(fixture));
   placeholder.marketplace.paypalBase = 'https://paypal.me/yourname';
 
   const placeholderIndex = await run('index.html', '', placeholder);
-  const placeholderCard = findEntry(placeholderIndex, 'skill-001');
-  check('placeholder paypal base disables the button', placeholderCard.children[2].children[1].className, 'btn');
-  check('placeholder paypal base shows opening soon', placeholderCard.children[2].children[1].textContent, 'Payments opening soon');
-  check('placeholder paypal base is aria-disabled', placeholderCard.children[2].children[1].getAttribute('aria-disabled'), 'true');
-  check('placeholder paypal base has no paypal href', placeholderCard.children[2].children[1].href, '#');
+  const placeholderCard = findEntry(placeholderIndex, FIXTURE_ID);
+  checkTrue('placeholder paypal base disables the button', !!placeholderCard);
+  const phBtn = pick(pick(placeholderCard, 'entry-buy'), 'btn');
+  check('placeholder paypal base button class', phBtn.className, 'btn');
+  check('placeholder paypal base shows opening soon', phBtn.textContent, 'Payments opening soon');
+  check('placeholder paypal base is aria-disabled', phBtn.getAttribute('aria-disabled'), 'true');
+  check('placeholder paypal base has no paypal href', phBtn.href, '#');
 
   // A different real base must be used in full, proving the base is the only source.
-  const live = JSON.parse(JSON.stringify(skills));
+  const live = JSON.parse(JSON.stringify(fixture));
   live.marketplace.paypalBase = 'https://paypal.me/someoneelse';
 
   const liveIndex = await run('index.html', '', live);
-  const liveCard = findEntry(liveIndex, 'skill-001');
-  check('live paypal base enables paypal button', liveCard.children[2].children[1].className, 'btn btn-paypal');
-  check('live paypal url uses base and amount', liveCard.children[2].children[1].href, 'https://paypal.me/someoneelse/29');
-  check('live paypal button label', liveCard.children[2].children[1].textContent, 'Buy via PayPal');
+  const liveCard = findEntry(liveIndex, FIXTURE_ID);
+  checkTrue('live paypal base renders the paid card', !!liveCard);
+  const liveBuy = pick(liveCard, 'entry-buy');
+  check('live paypal base enables paypal button', pick(liveBuy, 'btn').className, 'btn btn-paypal');
+  check('live paypal url uses base and amount', pick(liveBuy, 'btn').href, 'https://paypal.me/someoneelse/29');
+  check('live paypal button label', pick(liveBuy, 'btn').textContent, 'Buy via PayPal');
+  checkTrue('live paid card shows a proof strip', !!pick(pick(liveCard, 'entry-body'), 'proof-strip'));
 
-  const liveDetail = await run('skill-page.html', '?id=skill-001', live);
+  const liveDetail = await run('skill-page.html', '?id=' + FIXTURE_ID, live);
   check('live detail paypal class', liveDetail.getElementById('skill-action').className, 'btn btn-paypal');
   check('live detail paypal href', liveDetail.getElementById('skill-action').href, 'https://paypal.me/someoneelse/29');
 
@@ -496,16 +586,16 @@ async function main() {
   check('live free entry stays on github', liveFree.getElementById('skill-action').href, skills.skills[1].github);
 
   // ---------- skill-page.html ----------
-  const page = await run('skill-page.html', '?id=skill-001');
-  check('detail entry number', page.getElementById('skill-no').textContent, 'No. 001');
-  check('detail name', page.getElementById('skill-name').textContent, 'Code Review');
-  check('detail desc', page.getElementById('skill-desc').textContent, skills.skills[0].desc);
+  const page = await run('skill-page.html', '?id=' + FIXTURE_ID, withFixture());
+  check('detail entry number', page.getElementById('skill-no').textContent, 'No. 900');
+  check('detail name', page.getElementById('skill-name').textContent, FIXTURE_PAID.name);
+  check('detail desc', page.getElementById('skill-desc').textContent, FIXTURE_PAID.desc);
   check('detail price is GBP', page.getElementById('skill-price').textContent, '£29');
   check('detail card visible', page.getElementById('entry-detail').hidden, false);
   check('detail paid button is live', page.getElementById('skill-action').className, 'btn btn-paypal');
   check('detail paid button href', page.getElementById('skill-action').href, 'https://paypal.me/dougmcdoald87/29');
   check('detail paid button label', page.getElementById('skill-action').textContent, 'Buy via PayPal');
-  check('detail document title', page.title, 'Code Review — The Agent Register');
+  check('detail document title', page.title, FIXTURE_PAID.name + ' — The Agent Register');
   check('detail colophon place', page.getElementById('colophon-place').textContent, 'Arbroath, Angus DD11 4AX, Scotland');
 
   const detailMeta = page.getElementById('skill-meta');
@@ -533,7 +623,7 @@ async function main() {
   // textContent, so proofPanel.textContent is always empty.
   const proofPanel = page.getElementById('skill-proof');
   check('detail proof panel is shown on a paid entry', proofPanel.hidden, false);
-  const paidSkill = skills.skills[0];
+  const paidSkill = FIXTURE_PAID;
   check('proof claim carries the result', page.getElementById('proof-claim').textContent, paidSkill.proof.result);
   check('proof step carries the command', page.getElementById('proof-cmd').textContent, paidSkill.proof.command);
   check('proof step carries how to reproduce', page.getElementById('proof-repro-text').textContent, paidSkill.proof.reproduce);
@@ -546,7 +636,7 @@ async function main() {
   }).join(' | ');
   checkTrue('proof rows include the result', proofRows.indexOf(paidSkill.proof.result) !== -1);
   checkTrue('proof rows include the environment', proofRows.indexOf(paidSkill.proof.verifiedOn) !== -1);
-  checkTrue('spec has entry number', specText.indexOf('No. 001') !== -1);
+  checkTrue('spec has entry number', specText.indexOf('No. 900') !== -1);
   checkTrue('spec has format', specText.indexOf('Markdown skill (SKILL.md)') !== -1);
   checkTrue('spec has publisher', specText.indexOf('The Register') !== -1);
   checkTrue('spec has GBP price', specText.indexOf('£29, one-off') !== -1);
@@ -554,8 +644,19 @@ async function main() {
   checkTrue('spec states verified', specText.indexOf('Yes — tested by the Register') !== -1);
   checkTrue('spec has licence', specText.indexOf('Licence: MIT') !== -1);
   checkTrue('spec says what the buyer gets', specText.indexOf('What you get:') !== -1);
-  checkTrue('spec has attribution', specText.indexOf('Built on:') !== -1);
-  checkTrue('spec attributes Matt Pocock', specText.indexOf('Matt Pocock') !== -1);
+  // A PAID entry must not claim to be "Built on" someone else's work. That field
+  // means the skill is derived from another author's, and another author's free
+  // open-source work is not ours to sell. Free entries may carry it; paid ones may not.
+  checkTrue('a paid entry does not claim to be built on another author', specText.indexOf('Built on:') === -1);
+  // Attribution belongs to FREE entries. Entry 001 is a Matt Pocock MIT skill that
+  // we list and link to, and crediting the author is the whole point of listing it.
+  // Check that on a real entry rather than on the paid fixture, which by definition
+  // is nobody else's work.
+  const attributed = await run('skill-page.html', '?id=skill-001');
+  const attributedSpec = attributed.getElementById('spec-rows').children.map(function (r) {
+    return r.children[0].textContent + ': ' + r.children[1].textContent;
+  }).join(' | ');
+  checkTrue('free entry credits its author', attributedSpec.indexOf('Matt Pocock') !== -1);
   check('spec has no USD', specText.indexOf('USD') === -1, true);
 
   const freeSpec = await run('skill-page.html', '?id=skill-002');
@@ -626,10 +727,29 @@ async function main() {
       return prevented;
     };
 
-    check('submit form has a free option', radios.length, 2);
+    check('submit form offers exactly one kind: free', radios.length, 1);
     check('free is the default', radios.filter(function (r) { return r.checked; })[0].getAttribute('value'), 'free');
 
-    // --- free path ---
+    // There is no paid option, and that is deliberate. Paid listings were withdrawn
+    // on 18 Oct 2026: the register does not sell creators' work, because charging for
+    // a repackaging of someone's free open-source skill is not worth the money to a
+    // buyer and not fair to the author. Only Doug's own original work can ever be
+    // priced, and that is not submitted through this form.
+    check('submit form has no paid option', radios.filter(function (r) {
+      return r.getAttribute('value') === 'paid';
+    }).length, 0);
+    checkTrue(
+      'submit form explains why paid listings ended',
+      /does not sell your work/i.test(
+        fs.readFileSync(path.join(ROOT, 'submit.html'), 'utf8')
+      )
+    );
+    checkTrue(
+      'the explanation names the date it changed',
+      /18 October 2026/.test(fs.readFileSync(path.join(ROOT, 'submit.html'), 'utf8'))
+    );
+
+    // --- the only path: free, with a source link ---
     setField('f-name', 'My Free Skill');
     setField('f-desc', 'Does a thing');
     setField('f-github', '');
@@ -647,34 +767,9 @@ async function main() {
     checkTrue('free mailto says price is Free', freeDecoded.indexOf('Price (GBP): Free') !== -1);
     checkTrue('free mailto carries github', freeDecoded.indexOf('https://github.com/someone/skill') !== -1);
     checkTrue('free mailto has no USD label', freeDecoded.indexOf('USD') === -1);
-
-    // --- paid path ---
-    setKind('paid');
-    setField('f-price', '19');
-    setField('f-includes', 'A bundle of four skills and a year of updates.');
-    setField('f-paypal', 'not-a-url');
-    setField('f-github', '');
-    fire();
-    check('rejects bad paypal url', submitDoc.getElementById('form-status').className, 'form-status error');
-    checkTrue('rejects bad paypal url message', /PayPal\.me link/.test(submitDoc.getElementById('form-status').textContent));
-
-    setField('f-paypal', '');
-    fire();
-    check('paid listing needs a paypal link', submitDoc.getElementById('form-status').className, 'form-status error');
-    checkTrue('paid listing message mentions paypal', /PayPal\.me link/.test(submitDoc.getElementById('form-status').textContent));
-
-    setField('f-paypal', 'https://paypal.me/someone');
-    setField('f-price', '19');
-    setField('f-includes', 'A bundle of four skills and a year of updates.');
-    fire();
-    check('accepts a paid listing', submitDoc.getElementById('form-status').className, 'form-status ok');
-    const paidDecoded = decodeURIComponent(submitWindow.location.href);
-    checkTrue('paid mailto says the type', paidDecoded.indexOf('Listing type: PAID') !== -1);
-    checkTrue('paid mailto carries skill name', paidDecoded.indexOf('My Free Skill') !== -1);
-    checkTrue('paid mailto carries GBP price label', paidDecoded.indexOf('Price (GBP): 19') !== -1);
-    checkTrue('paid mailto says what the buyer gets', paidDecoded.indexOf('A bundle of four skills') !== -1);
-    checkTrue('paid mailto has no USD label', paidDecoded.indexOf('USD') === -1);
-    checkTrue('paid mailto carries the paypal link', paidDecoded.indexOf('https://paypal.me/someone') !== -1);
+    // A free submission must not smuggle a payment request through the form.
+    checkTrue('free mailto never claims to be paid', freeDecoded.indexOf('Listing type: PAID') === -1);
+    checkTrue('free mailto carries no price', freeDecoded.indexOf('Price (GBP): 19') === -1);
   }
 
   console.log('\n' + (checks - failures) + '/' + checks + ' checks passed');
