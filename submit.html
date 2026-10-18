@@ -17,6 +17,11 @@ input, textarea, select { width: 100%; padding: 8px; font-size: 14px; border: 1p
 textarea { min-height: 80px; }
 .submit-btn { background: #0070ba; color: #fff; padding: 10px 24px; border: none; border-radius: 4px; font-weight: 600; font-size: 14px; cursor: pointer; width: 100%; }
 .submit-btn:hover { background: #005ea5; }
+.notice { background: #fff; border: 1px solid #ddd; border-left: 4px solid #0070ba; border-radius: 4px; padding: 14px 16px; font-size: 14px; margin-bottom: 20px; }
+.notice a { color: #0070ba; }
+#form-status { font-size: 14px; margin-top: 12px; }
+#form-status.error { color: #b00020; }
+#form-status.ok { color: #0a7d33; }
 .back { display: inline-block; margin-top: 20px; color: #0070ba; text-decoration: none; font-size: 14px; }
 .back:hover { text-decoration: underline; }
 footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }
@@ -29,15 +34,20 @@ footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-s
 <p class="sub">List your AI agent skill on the marketplace.</p>
 </header>
 
-<form>
-<label>Skill name</label>
-<input type="text" placeholder="e.g. Code Review Assistant" required>
+<div class="notice">
+<p>Submissions are reviewed by hand. Fill this in and your email app opens with the details
+pre-filled &mdash; send it and the skill is reviewed before it goes live.</p>
+</div>
 
-<label>Description</label>
-<textarea placeholder="What does this skill do?" required></textarea>
+<form id="skill-form">
+<label for="f-name">Skill name</label>
+<input type="text" id="f-name" name="name" placeholder="e.g. Code Review Assistant" required>
 
-<label>Platform</label>
-<select>
+<label for="f-desc">Description</label>
+<textarea id="f-desc" name="description" placeholder="What does this skill do?" required></textarea>
+
+<label for="f-platform">Platform</label>
+<select id="f-platform" name="platform">
 <option>Universal (all AI agents)</option>
 <option>Claude Code</option>
 <option>Cursor</option>
@@ -45,22 +55,23 @@ footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-s
 <option>Continue</option>
 </select>
 
-<label>Category</label>
-<select>
+<label for="f-category">Category</label>
+<select id="f-category" name="category">
 <option>Engineering</option>
 <option>Productivity</option>
 </select>
 
-<label>Price (USD)</label>
-<input type="number" min="0" step="0.01" placeholder="0.00" required>
+<label for="f-price">Price (USD)</label>
+<input type="number" id="f-price" name="price" min="0" step="0.01" placeholder="0.00" required>
 
-<label>PayPal.me link</label>
-<input type="url" placeholder="https://paypal.me/yourname" required>
+<label for="f-paypal">PayPal.me link</label>
+<input type="url" id="f-paypal" name="paypal" placeholder="https://paypal.me/yourname">
 
-<label>GitHub link (free skills)</label>
-<input type="url" placeholder="https://github.com/yourname/skill">
+<label for="f-github">GitHub link (free skills)</label>
+<input type="url" id="f-github" name="github" placeholder="https://github.com/yourname/skill">
 
 <button type="submit" class="submit-btn">Submit skill</button>
+<p id="form-status" role="status"></p>
 </form>
 
 <a href="index.html" class="back">&larr; Back to marketplace</a>
@@ -69,5 +80,75 @@ footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-s
 <p>AI Agent Skills Marketplace &mdash; Platform-agnostic. Works with every AI agent. PayPal payments only.</p>
 </footer>
 </div>
+<script>
+var REVIEW_EMAIL = 'dougmoug@gmail.com';
+
+function fieldValue(id) {
+  var el = document.getElementById(id);
+  return el && el.value ? el.value.trim() : '';
+}
+
+function buildBody() {
+  var price = fieldValue('f-price');
+  var paypal = fieldValue('f-paypal');
+  var github = fieldValue('f-github');
+  return [
+    'Skill name: ' + fieldValue('f-name'),
+    '',
+    'Description:',
+    fieldValue('f-desc'),
+    '',
+    'Platform: ' + fieldValue('f-platform'),
+    'Category: ' + fieldValue('f-category'),
+    'Price (USD): ' + (price || '0'),
+    'PayPal.me link: ' + (paypal || '(none - free skill)'),
+    'GitHub link: ' + (github || '(none)'),
+    ''
+  ].join('\n');
+}
+
+document.getElementById('skill-form').addEventListener('submit', function (event) {
+  event.preventDefault();
+  var status = document.getElementById('form-status');
+  var name = fieldValue('f-name');
+  var price = fieldValue('f-price');
+  var paypal = fieldValue('f-paypal');
+  var github = fieldValue('f-github');
+
+  if (!name) {
+    status.className = 'error';
+    status.textContent = 'Skill name is required.';
+    return;
+  }
+
+  if (!paypal && !github) {
+    status.className = 'error';
+    status.textContent = 'Add a PayPal.me link for a paid skill, or a GitHub link for a free skill.';
+    return;
+  }
+
+  if (paypal && !/^https:\/\/paypal\.me\/[A-Za-z0-9][A-Za-z0-9_.-]*\/?$/.test(paypal)) {
+    status.className = 'error';
+    status.textContent = 'That does not look like a PayPal.me link. It should start with https://paypal.me/';
+    return;
+  }
+
+  if (github && !/^https:\/\/github\.com\/.+/.test(github)) {
+    status.className = 'error';
+    status.textContent = 'That does not look like a GitHub link. It should start with https://github.com/';
+    return;
+  }
+
+  var subject = 'Skill submission: ' + name;
+  var href = 'mailto:' + REVIEW_EMAIL +
+    '?subject=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(buildBody());
+
+  status.className = 'ok';
+  status.textContent = 'Opening your email app. If nothing happens, email ' + REVIEW_EMAIL +
+    ' with the skill details and we will list it.';
+  window.location.href = href;
+});
+</script>
 </body>
 </html>

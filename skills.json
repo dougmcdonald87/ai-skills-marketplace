@@ -1,4 +1,5 @@
 {
+  "paypalBase": "https://paypal.me/yourname",
   "skills": [
     {
       "id": "skill-001",
@@ -7,7 +8,6 @@
       "platform": "Universal platform",
       "category": "Engineering",
       "price": 29,
-      "paypal": "https://paypal.me/yourname/29",
       "github": null,
       "free": false,
       "verified": true
@@ -19,7 +19,6 @@
       "platform": "Universal platform",
       "category": "Productivity",
       "price": 0,
-      "paypal": null,
       "github": "https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs",
       "free": true,
       "verified": true
@@ -31,7 +30,6 @@
       "platform": "Universal platform",
       "category": "Engineering",
       "price": 0,
-      "paypal": null,
       "github": "https://github.com/mattpocock/skills/tree/main/skills/engineering/tdd",
       "free": true,
       "verified": true
@@ -43,7 +41,6 @@
       "platform": "Universal platform",
       "category": "Productivity",
       "price": 19,
-      "paypal": "https://paypal.me/yourname/19",
       "github": null,
       "free": false,
       "verified": true
