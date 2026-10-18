@@ -776,6 +776,32 @@ a:hover { color: var(--seal-2); }
   color: var(--ink-3);
 }
 
+.plain-list {
+  list-style: none;
+  margin-top: 26px;
+  max-width: 70ch;
+}
+
+.plain-list li {
+  position: relative;
+  padding: 16px 0 16px 26px;
+  border-bottom: 1px solid var(--rule);
+  font-size: 15.5px;
+  color: var(--ink-2);
+}
+
+.plain-list li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 24px;
+  width: 10px;
+  height: 1px;
+  background: var(--seal);
+}
+
+.plain-list li:first-child { border-top: 1px solid var(--rule); }
+
 .load-error {
   padding: 30px 0;
   font-size: 15px;

@@ -198,13 +198,24 @@ async function main() {
   const config = skills.marketplace;
 
   // ---------- static source checks: the UK units must not regress ----------
-  const pages = ['index.html', 'skill-page.html', 'submit.html'];
+  // Strip CSS before the spelling sweep, so "color:" as a CSS property is not
+  // mistaken for American prose. Only visible copy is checked.
+  const proseOnly = (src) => src
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/style="[^"]*"/gi, ' ')
+    .replace(/<[^>]+>/g, ' ');
+
+  const pages = ['index.html', 'skill-page.html', 'submit.html', 'about.html'];
   pages.forEach(function (file) {
     const src = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    const prose = proseOnly(src);
     check('no USD in ' + file, src.indexOf('USD') === -1, true);
     check('no one-time in ' + file, src.indexOf('one-time') === -1, true);
-    check('no american spelling color in ' + file, /\bcolor\b/i.test(src), false);
-    check('no american spelling customize in ' + file, /\bcustomiz/i.test(src), false);
+    check('no american spelling color in ' + file, /\bcolor\b/i.test(prose), false);
+    check('no american spelling customize in ' + file, /\bcustomiz/i.test(prose), false);
+    check('no american spelling behavior in ' + file, /\bbehavior/i.test(prose), false);
+    check('no american spelling organization in ' + file, /\borganization/i.test(prose), false);
+    check('no american spelling catalog in ' + file, /\bcatalog\b/i.test(prose), false);
     check('lang is en-GB in ' + file, src.indexOf('lang="en-GB"') !== -1, true);
   });
   const jsonSrc = fs.readFileSync(path.join(ROOT, 'skills.json'), 'utf8');
@@ -213,6 +224,22 @@ async function main() {
   check('address is DD11 4AX in skills.json', jsonSrc.indexOf('DD11 4AX') !== -1, true);
   check('currency is GBP in skills.json', config.currency, 'GBP');
   check('locale is en-GB in skills.json', config.locale, 'en-GB');
+
+  // ---------- about.html ----------
+  const about = await run('about.html');
+  check('about sets lang to en-GB', about.documentElement.lang, 'en-GB');
+  check('about place', about.getElementById('hero-place').textContent, 'Arbroath, Angus DD11 4AX, Scotland');
+  check('about colophon place', about.getElementById('colophon-place').textContent, 'Arbroath, Angus DD11 4AX, Scotland');
+  check('about entry count', about.getElementById('fact-count').textContent, '4 entries, numbered in the order they were accepted.');
+  checkTrue('about colophon mentions GBP', about.getElementById('colophon-note').textContent.indexOf('GBP') !== -1);
+
+  // Every page must link to the other three, or a visitor can get stranded.
+  pages.forEach(function (file) {
+    const src = fs.readFileSync(path.join(ROOT, file), 'utf8');
+    ['index.html', 'about.html', 'submit.html'].forEach(function (target) {
+      check(file + ' links to ' + target, src.indexOf('href="' + target + '"') !== -1, true);
+    });
+  });
 
   // ---------- index.html ----------
   const index = await run('index.html');
