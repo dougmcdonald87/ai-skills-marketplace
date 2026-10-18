@@ -37,6 +37,7 @@ class El {
     this.rel = '';
     this.value = '';
     this.lang = '';
+    this.checked = false;
     this.attributes = {};
     this.listeners = {};
     this._text = '';
@@ -53,6 +54,7 @@ class El {
   appendChild(child) {
     this.children.push(child);
     child.parent = this;
+    if (this._scope && this._scope.indexOf(child) === -1) this._scope.push(child);
     return child;
   }
   removeChild(child) {
@@ -91,32 +93,76 @@ class El {
     return out;
   }
   querySelectorAll(selector) {
-    const all = this.descendants();
-    if (selector.charAt(0) === '.') {
-      const cls = selector.slice(1);
-      return all.filter(function (el) {
-        return String(el.className).split(/\s+/).indexOf(cls) !== -1;
-      });
-    }
-    return all.filter(function (el) { return el.tagName === selector.toUpperCase(); });
+    const scope = this._scope || this.descendants();
+    return scope.filter(function (el) { return matches(el, selector); });
   }
   querySelector(selector) {
     return this.querySelectorAll(selector)[0] || null;
   }
 }
 
+function matches(el, selector) {
+  selector = String(selector).trim();
+
+  // tag[attr="value"]:checked
+  let checkedOnly = false;
+  if (/:checked$/.test(selector)) {
+    checkedOnly = true;
+    selector = selector.replace(/:checked$/, '');
+  }
+
+  const attrMatch = /\[([a-zA-Z-]+)(?:=["']?([^"'\]]*)["']?)?\]/.exec(selector);
+  let attrName = null;
+  let attrValue = null;
+  if (attrMatch) {
+    attrName = attrMatch[1];
+    attrValue = attrMatch[2];
+    selector = selector.replace(attrMatch[0], '');
+  }
+
+  const tag = selector.trim();
+  if (tag && tag.charAt(0) !== '.') {
+    if (el.tagName !== tag.toUpperCase()) return false;
+  } else if (tag.charAt(0) === '.') {
+    const cls = tag.slice(1);
+    if (String(el.className).split(/\s+/).indexOf(cls) === -1) return false;
+  }
+
+  if (attrName) {
+    const actual = el.getAttribute(attrName);
+    if (actual === null) return false;
+    if (attrValue !== undefined && attrValue !== '' && String(actual) !== attrValue) return false;
+  }
+
+  if (checkedOnly) {
+    if (el.checked !== true) return false;
+  }
+
+  return true;
+}
+
 function buildDocument(html) {
   const registry = {};
-  const tagPattern = /<([a-zA-Z][a-zA-Z0-9]*)([^>]*)>/g;
+  const all = [];
+  const tagPattern = /<([a-zA-Z][a-zA-Z0-9]*)((?:\s+[a-zA-Z-]+(?:="[^"]*")?)*)\s*\/?>/g;
   let match;
   while ((match = tagPattern.exec(html)) !== null) {
-    const attrs = match[2];
-    const idMatch = /id="([^"]+)"/.exec(attrs);
-    if (!idMatch) continue;
-    const el = new El(match[1]);
+    const tag = match[1];
+    const attrs = match[2] || '';
+    const el = new El(tag);
     if (/(^|\s)hidden(\s|=|>|$)/.test(attrs)) el.hidden = true;
-    registry[idMatch[1]] = el;
+    if (/(^|\s)checked(\s|=|>|$)/.test(attrs)) el.checked = true;
+    const attrPattern = /([a-zA-Z-]+)(?:="([^"]*)")?/g;
+    let a;
+    while ((a = attrPattern.exec(attrs)) !== null) {
+      el.setAttribute(a[1], a[2] === undefined ? '' : a[2]);
+      if (a[1] === 'value') el.value = a[2] === undefined ? '' : a[2];
+    }
+    all.push(el);
+    const idMatch = /id="([^"]+)"/.exec(attrs);
+    if (idMatch) registry[idMatch[1]] = el;
   }
+  all.forEach(function (el) { el._scope = all; });
   const doc = {
     title: '',
     documentElement: new El('html'),
@@ -135,18 +181,7 @@ function buildDocument(html) {
       return node;
     },
     querySelectorAll(selector) {
-      const all = Object.keys(registry).map(function (k) { return registry[k]; });
-      const pool = [];
-      all.forEach(function (el) {
-        el.descendants().forEach(function (d) { pool.push(d); });
-      });
-      if (selector.charAt(0) === '.') {
-        const cls = selector.slice(1);
-        return pool.filter(function (el) {
-          return String(el.className).split(/\s+/).indexOf(cls) !== -1;
-        });
-      }
-      return pool.filter(function (el) { return el.tagName === selector.toUpperCase(); });
+      return all.filter(function (el) { return matches(el, selector); });
     },
     _registry: registry,
   };
@@ -261,11 +296,20 @@ async function main() {
   check('index entry description', firstBody.children[1].textContent, skills.skills[0].desc);
   check('index entry price is GBP', first.children[2].children[0].textContent, '£29');
 
-  const meta = firstBody.children[2];
+  const meta = firstBody.children.filter(function (c) {
+    return String(c.className).indexOf('entry-meta') !== -1;
+  })[0];
+  checkTrue('index entry has a meta row', !!meta);
   const metaText = meta.children.map(function (c) { return c.textContent; }).join(' | ');
   checkTrue('index entry meta has category', metaText.indexOf('Engineering') !== -1);
   checkTrue('index entry meta has verified', metaText.indexOf('Verified') !== -1);
   checkTrue('index entry meta has publisher', metaText.indexOf('The Register') !== -1);
+
+  const includesText = firstBody.children.filter(function (c) {
+    return String(c.className).indexOf('entry-includes') !== -1;
+  })[0];
+  checkTrue('index paid entry states what you get', !!includesText);
+  checkTrue('index includes mentions the bundle', includesText.textContent.indexOf('separate runnable skills') !== -1);
 
   const firstBtn = first.children[2].children[1];
   check('index paid button is a paypal button', firstBtn.className, 'btn btn-paypal');
@@ -368,7 +412,7 @@ async function main() {
   check('detail spec is shown', page.getElementById('skill-spec').hidden, false);
   check('detail install section is shown', page.getElementById('skill-install').hidden, false);
   const specRows = page.getElementById('spec-rows').children;
-  check('detail spec row count', specRows.length, 8);
+  check('detail spec row count', specRows.length, 11);
   const specText = specRows.map(function (r) {
     return r.children[0].textContent + ': ' + r.children[1].textContent;
   }).join(' | ');
@@ -378,6 +422,10 @@ async function main() {
   checkTrue('spec has GBP price', specText.indexOf('£29, one-off') !== -1);
   checkTrue('spec has payment method', specText.indexOf('PayPal') !== -1);
   checkTrue('spec states verified', specText.indexOf('Yes — tested by the Register') !== -1);
+  checkTrue('spec has licence', specText.indexOf('Licence: MIT') !== -1);
+  checkTrue('spec says what the buyer gets', specText.indexOf('What you get:') !== -1);
+  checkTrue('spec has attribution', specText.indexOf('Built on:') !== -1);
+  checkTrue('spec attributes Matt Pocock', specText.indexOf('Matt Pocock') !== -1);
   check('spec has no USD', specText.indexOf('USD') === -1, true);
 
   const freeSpec = await run('skill-page.html', '?id=skill-002');
@@ -386,6 +434,8 @@ async function main() {
   }).join(' | ');
   checkTrue('free spec states no payment', freeSpecText.indexOf('Payment: None') !== -1);
   checkTrue('free spec price is Free', freeSpecText.indexOf('Price: Free') !== -1);
+  checkTrue('free spec has no what-you-get row', freeSpecText.indexOf('What you get:') === -1);
+  checkTrue('free spec names the publisher', freeSpecText.indexOf('Publisher: Matt Pocock') !== -1);
 
   const free = await run('skill-page.html', '?id=skill-002');
   check('detail free price', free.getElementById('skill-price').textContent, 'Free');
@@ -432,15 +482,42 @@ async function main() {
     const setField = (id, value) => {
       submitDoc.getElementById(id).value = value;
     };
+    const radios = submitDoc.getElementById('skill-form').querySelectorAll('input[name="kind"]');
+    const setKind = (value) => {
+      radios.forEach(function (r) { r.checked = r.getAttribute('value') === value; });
+    };
     const fire = () => {
       let prevented = false;
       capturedHandler({ preventDefault: () => { prevented = true; } });
       return prevented;
     };
 
-    setField('f-name', 'My Skill');
+    check('submit form has a free option', radios.length, 2);
+    check('free is the default', radios.filter(function (r) { return r.checked; })[0].getAttribute('value'), 'free');
+
+    // --- free path ---
+    setField('f-name', 'My Free Skill');
     setField('f-desc', 'Does a thing');
+    setField('f-github', '');
+    setKind('free');
+    fire();
+    check('free listing needs a github link', submitDoc.getElementById('form-status').className, 'form-status error');
+    checkTrue('free listing message mentions github', /GitHub link/.test(submitDoc.getElementById('form-status').textContent));
+
+    setField('f-github', 'https://github.com/someone/skill');
+    fire();
+    check('accepts a free listing with github only', submitDoc.getElementById('form-status').className, 'form-status ok');
+    check('mailto targets review address', submitWindow.location.href.indexOf('mailto:dougmoug@gmail.com') === 0, true);
+    const freeDecoded = decodeURIComponent(submitWindow.location.href);
+    checkTrue('free mailto says the type', freeDecoded.indexOf('Listing type: FREE') !== -1);
+    checkTrue('free mailto says price is Free', freeDecoded.indexOf('Price (GBP): Free') !== -1);
+    checkTrue('free mailto carries github', freeDecoded.indexOf('https://github.com/someone/skill') !== -1);
+    checkTrue('free mailto has no USD label', freeDecoded.indexOf('USD') === -1);
+
+    // --- paid path ---
+    setKind('paid');
     setField('f-price', '19');
+    setField('f-includes', 'A bundle of four skills and a year of updates.');
     setField('f-paypal', 'not-a-url');
     setField('f-github', '');
     fire();
@@ -448,19 +525,22 @@ async function main() {
     checkTrue('rejects bad paypal url message', /PayPal\.me link/.test(submitDoc.getElementById('form-status').textContent));
 
     setField('f-paypal', '');
-    setField('f-github', '');
     fire();
-    check('requires paypal or github', submitDoc.getElementById('form-status').className, 'form-status error');
+    check('paid listing needs a paypal link', submitDoc.getElementById('form-status').className, 'form-status error');
+    checkTrue('paid listing message mentions paypal', /PayPal\.me link/.test(submitDoc.getElementById('form-status').textContent));
 
-    setField('f-github', 'https://github.com/someone/skill');
+    setField('f-paypal', 'https://paypal.me/someone');
+    setField('f-price', '19');
+    setField('f-includes', 'A bundle of four skills and a year of updates.');
     fire();
-    check('accepts free entry with github only', submitDoc.getElementById('form-status').className, 'form-status ok');
-    check('mailto targets review address', submitWindow.location.href.indexOf('mailto:dougmoug@gmail.com') === 0, true);
-    const decoded = decodeURIComponent(submitWindow.location.href);
-    checkTrue('mailto body carries skill name', decoded.indexOf('My Skill') !== -1);
-    checkTrue('mailto body carries GBP price label', decoded.indexOf('Price (GBP): 19') !== -1);
-    checkTrue('mailto body has no USD label', decoded.indexOf('USD') === -1);
-    checkTrue('mailto body carries github', decoded.indexOf('https://github.com/someone/skill') !== -1);
+    check('accepts a paid listing', submitDoc.getElementById('form-status').className, 'form-status ok');
+    const paidDecoded = decodeURIComponent(submitWindow.location.href);
+    checkTrue('paid mailto says the type', paidDecoded.indexOf('Listing type: PAID') !== -1);
+    checkTrue('paid mailto carries skill name', paidDecoded.indexOf('My Free Skill') !== -1);
+    checkTrue('paid mailto carries GBP price label', paidDecoded.indexOf('Price (GBP): 19') !== -1);
+    checkTrue('paid mailto says what the buyer gets', paidDecoded.indexOf('A bundle of four skills') !== -1);
+    checkTrue('paid mailto has no USD label', paidDecoded.indexOf('USD') === -1);
+    checkTrue('paid mailto carries the paypal link', paidDecoded.indexOf('https://paypal.me/someone') !== -1);
   }
 
   console.log('\n' + (checks - failures) + '/' + checks + ' checks passed');

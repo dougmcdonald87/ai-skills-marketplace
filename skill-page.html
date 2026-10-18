@@ -195,11 +195,18 @@ function renderSpec(skill, config) {
     ['Category', skill.category],
     ['Platforms', skill.platform],
     ['Format', skill.format || 'Markdown skill (SKILL.md)'],
+    ['Licence', skill.licence || 'Not stated'],
     ['Publisher', skill.publisher || 'Uncredited'],
     ['Price', skill.free ? 'Free' : formatPrice(skill.price, config) + ', one-off'],
     ['Payment', skill.free ? 'None' : 'PayPal'],
     ['Verified', skill.verified ? 'Yes — tested by the Register' : 'No']
   ];
+  if (skill.includes) {
+    entries.splice(6, 0, ['What you get', skill.includes]);
+  }
+  if (skill.attribution) {
+    entries.push(['Built on', skill.attribution]);
+  }
   entries.forEach(function (pair) {
     var row = document.createElement('div');
     row.className = 'spec-row';

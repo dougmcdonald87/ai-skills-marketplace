@@ -162,6 +162,13 @@ function buildEntry(skill, config) {
   desc.className = 'entry-desc';
   desc.textContent = skill.desc;
 
+  var includes = null;
+  if (skill.includes) {
+    includes = document.createElement('p');
+    includes.className = 'entry-includes';
+    includes.textContent = skill.includes;
+  }
+
   var meta = document.createElement('p');
   meta.className = 'entry-meta';
   [skill.category, skill.platform].forEach(function (text) {
@@ -199,6 +206,7 @@ function buildEntry(skill, config) {
 
   body.appendChild(name);
   body.appendChild(desc);
+  if (includes) body.appendChild(includes);
   body.appendChild(meta);
 
   var buy = document.createElement('div');

@@ -89,18 +89,37 @@
           <option>Productivity</option>
           <option>Research</option>
           <option>Writing</option>
+          <option>Design</option>
         </select>
 
-        <label for="f-price">Price (GBP)</label>
-        <input type="number" id="f-price" name="price" min="0" step="0.01" placeholder="0.00" required>
-        <p class="form-hint">0.00 publishes it as a free entry.</p>
+        <fieldset class="choice">
+          <legend>What are you listing?</legend>
+          <label class="choice-opt">
+            <input type="radio" name="kind" value="free" checked>
+            <span><strong>Your skills, free.</strong> The entry links to your repository. Nothing is sold.</span>
+          </label>
+          <label class="choice-opt">
+            <input type="radio" name="kind" value="paid">
+            <span><strong>A paid product.</strong> A bundle, a supported edition, or a tier that is not free today. The buyer pays you directly.</span>
+          </label>
+        </fieldset>
+
+        <div id="paid-fields" hidden>
+          <label for="f-price">Price (GBP)</label>
+          <input type="number" id="f-price" name="price" min="0" step="0.01" placeholder="0.00" required>
+
+          <label for="f-includes">What does the buyer get?</label>
+          <textarea id="f-includes" name="includes" placeholder="A bundle of four skills. Updates for a year. Email support if it breaks."></textarea>
+          <p class="form-hint">One line, and be specific. This is what justifies a price.</p>
+        </div>
 
         <label for="f-paypal">PayPal.me link</label>
         <input type="url" id="f-paypal" name="paypal" placeholder="https://paypal.me/yourname">
-        <p class="form-hint">For paid entries. You set the price, you keep the money.</p>
+        <p class="form-hint">For paid listings only. You set the price, you keep the money.</p>
 
         <label for="f-github">GitHub link</label>
         <input type="url" id="f-github" name="github" placeholder="https://github.com/you/skill">
+        <p class="form-hint">Required for a free listing. The entry links straight to your source.</p>
 
         <button type="submit" class="btn btn-paypal">Send the submission</button>
         <p class="form-status" id="form-status" role="status"></p>
@@ -141,20 +160,24 @@ function fieldValue(id) {
   return el && el.value ? el.value.trim() : '';
 }
 
-function buildBody(config) {
+function buildBody(config, paid) {
   var price = fieldValue('f-price');
   var paypal = fieldValue('f-paypal');
   var github = fieldValue('f-github');
+  var includes = fieldValue('f-includes');
   return [
     'Skill name: ' + fieldValue('f-name'),
+    '',
+    'Listing type: ' + (paid ? 'PAID' : 'FREE'),
     '',
     'Description:',
     fieldValue('f-desc'),
     '',
     'Platform: ' + fieldValue('f-platform'),
     'Category: ' + fieldValue('f-category'),
-    'Price (' + config.currency + '): ' + (price || '0'),
-    'PayPal.me link: ' + (paypal || '(none - free entry)'),
+    'Price (' + config.currency + '): ' + (paid ? (price || '0') : 'Free'),
+    'What the buyer gets: ' + (includes || '(not stated)'),
+    'PayPal.me link: ' + (paypal || '(none)'),
     'GitHub link: ' + (github || '(none)'),
     ''
   ].join('\n');
@@ -177,12 +200,29 @@ fetch('skills.json')
     var issue = document.getElementById('wordmark-issue');
     if (issue && config.issue) issue.textContent = config.issue;
 
+    var form = document.getElementById('skill-form');
+    var paidFields = document.getElementById('paid-fields');
+    var priceInput = document.getElementById('f-price');
+
+    function syncKind() {
+      var paid = form.querySelector('input[name="kind"]:checked').value === 'paid';
+      paidFields.hidden = !paid;
+      priceInput.required = paid;
+      document.getElementById('f-paypal').required = paid;
+    }
+    Array.prototype.forEach.call(form.querySelectorAll('input[name="kind"]'), function (radio) {
+      radio.addEventListener('change', syncKind);
+    });
+    syncKind();
+
     document.getElementById('skill-form').addEventListener('submit', function (event) {
       event.preventDefault();
       var status = document.getElementById('form-status');
       var name = fieldValue('f-name');
       var paypal = fieldValue('f-paypal');
       var github = fieldValue('f-github');
+      var kind = form.querySelector('input[name="kind"]:checked').value;
+      var paid = kind === 'paid';
 
       if (!name) {
         status.className = 'form-status error';
@@ -190,9 +230,21 @@ fetch('skills.json')
         return;
       }
 
-      if (!paypal && !github) {
+      if (!paid && !github) {
         status.className = 'form-status error';
-        status.textContent = 'Add a PayPal.me link for a paid entry, or a GitHub link for a free one.';
+        status.textContent = 'A free listing needs a GitHub link, so buyers can install it from the source.';
+        return;
+      }
+
+      if (paid && !paypal) {
+        status.className = 'form-status error';
+        status.textContent = 'A paid listing needs a PayPal.me link, so the money goes straight to you.';
+        return;
+      }
+
+      if (paid && !fieldValue('f-price')) {
+        status.className = 'form-status error';
+        status.textContent = 'A paid listing needs a price.';
         return;
       }
 
@@ -210,7 +262,7 @@ fetch('skills.json')
 
       var href = 'mailto:' + config.reviewEmail +
         '?subject=' + encodeURIComponent('Skill submission: ' + name) +
-        '&body=' + encodeURIComponent(buildBody(config));
+        '&body=' + encodeURIComponent(buildBody(config, paid));
 
       status.className = 'form-status ok';
       status.textContent = 'Opening your email app. If nothing happens, email ' + config.reviewEmail +

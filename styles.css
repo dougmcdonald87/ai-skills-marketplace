@@ -384,6 +384,15 @@ a:hover { color: var(--seal-2); }
   margin-bottom: 14px;
 }
 
+.entry-includes {
+  font-size: 13.5px;
+  color: var(--ink-3);
+  max-width: 58ch;
+  margin-bottom: 14px;
+  padding-left: 12px;
+  border-left: 2px solid var(--rule-strong);
+}
+
 .entry-meta {
   display: flex;
   flex-wrap: wrap;
@@ -771,6 +780,49 @@ a:hover { color: var(--seal-2); }
 
 .form-status.error { color: var(--seal); }
 .form-status.ok { color: #2c6b3f; }
+
+/* ---------- Free vs paid choice ---------- */
+
+.choice {
+  border: 1px solid var(--rule-strong);
+  padding: 4px 16px 14px;
+  margin: 0 0 20px;
+}
+
+.choice legend {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  padding: 0 8px;
+}
+
+.choice-opt {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  padding: 11px 0;
+  cursor: pointer;
+  border-bottom: 1px solid var(--rule);
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 14px;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--ink-2);
+}
+
+.choice-opt:last-child { border-bottom: none; }
+
+.choice-opt input {
+  width: auto;
+  margin: 3px 0 0;
+  flex: none;
+  accent-color: var(--seal);
+}
+
+.choice-opt strong { color: var(--ink); font-weight: 500; display: block; }
 
 /* ---------- Empty state ---------- */
 

@@ -97,8 +97,17 @@ function main() {
     free: free,
     verified: args.verified === true || args.verified === 'true',
     publisher: String(args.publisher).trim(),
-    format: args.format || 'Markdown skill (SKILL.md)'
+    format: args.format || 'Markdown skill (SKILL.md)',
+    licence: args.licence || 'MIT'
   };
+
+  // A paid entry has to say what the buyer gets, or the price is arbitrary.
+  if (args.includes) entry.includes = String(args.includes).trim();
+  if (args.attribution) entry.attribution = String(args.attribution).trim();
+
+  if (!free && !entry.includes) {
+    fail('A paid entry needs --includes. Say what the buyer actually gets for the price.');
+  }
 
   if (existing) {
     skills[skills.indexOf(existing)] = entry;
