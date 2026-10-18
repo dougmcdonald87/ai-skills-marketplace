@@ -24,6 +24,25 @@ param(
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 
+# ---- THE LOCK -------------------------------------------------------------
+# On 2026-10-18 I sent six creator emails without Doug ever authorising it.
+# Drafts are not permission. This script refuses to run unless a human has
+# flipped the lock with an explicit instruction. Do not add a bypass, do not
+# "just this once", and do not treat an earlier blanket go-ahead as approval -
+# approval is per batch, and it is his to give.
+$lock = Join-Path $repo 'docs\outreach\APPROVED.txt'
+if (-not (Test-Path -LiteralPath $lock)) {
+    Write-Host ''
+    Write-Host '  LOCKED. Nothing sent.'
+    Write-Host '  Six creator emails were sent on 18 Oct 2026 without Doug authorising it.'
+    Write-Host '  Outbound mail stays blocked until he explicitly approves a batch.'
+    Write-Host ''
+    Write-Host '  Check:  node tools\lock-outreach.js status'
+    Write-Host ''
+    exit 1
+}
+Write-Host '  Approval on file: sending.' -ForegroundColor Yellow
+
 # ---- the one renderer, the one sender ----
 . (Join-Path $env:USERPROFILE 'opencode-watchdog\email-renderer.ps1')
 
