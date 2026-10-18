@@ -1,101 +1,222 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Skill &mdash; AI Agent Skills Marketplace</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #111; line-height: 1.5; }
-.container { max-width: 720px; margin: 0 auto; padding: 24px; }
-header { margin-bottom: 32px; }
-h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
-p.sub { color: #555; font-size: 14px; }
-.skill-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
-.skill-card h3 { font-size: 18px; margin-bottom: 4px; }
-.skill-card p.desc { font-size: 14px; color: #444; margin-bottom: 12px; }
-.skill-card .meta { font-size: 12px; color: #777; margin-bottom: 12px; display: flex; gap: 12px; flex-wrap: wrap; }
-.skill-card .meta .verified { color: #0a7d33; font-weight: 600; }
-.skill-card .price { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
-.paypal-btn { display: inline-block; background: #0070ba; color: #fff; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; }
-.paypal-btn:hover { background: #005ea5; }
-.free-btn { display: inline-block; background: #e8e8e8; color: #111; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; }
-.free-btn:hover { background: #d8d8d8; }
-.back { display: inline-block; margin-top: 20px; color: #0070ba; text-decoration: none; font-size: 14px; }
-.back:hover { text-decoration: underline; }
-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }
-</style>
+<title>Entry &mdash; The Agent Register</title>
+<meta name="description" content="A single entry from The Agent Register of AI agent skills.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="container">
-<header>
-<h1 id="skill-name">&mdash;</h1>
-<p class="sub" id="skill-platform">Platform-agnostic AI agent skill. PayPal only.</p>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="wordmark" href="index.html">
+      <svg class="wordmark-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="18.5" fill="none" stroke="#9a1b16" stroke-width="1.4"/>
+        <circle cx="20" cy="20" r="14" fill="none" stroke="#9a1b16" stroke-width="0.7" opacity="0.55"/>
+        <path d="M13 20.4l4.6 4.6L27 15.6" fill="none" stroke="#9a1b16" stroke-width="2.1" stroke-linecap="square"/>
+      </svg>
+      <span>
+        <span class="wordmark-text">The Agent Register</span>
+        <span class="wordmark-sub" id="wordmark-issue">Issue 01</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html">Catalogue</a>
+      <a href="submit.html">Submit a skill</a>
+    </nav>
+  </div>
 </header>
 
-<div class="skill-card" id="skill-card" hidden>
-<p class="desc" id="skill-desc"></p>
-<div class="meta"><span id="skill-category"></span><span id="skill-verified" class="verified" hidden>Verified</span></div>
-<div class="price" id="skill-price"></div>
-<a id="skill-action" class="free-btn" href="#" target="_blank" rel="noopener">Install from GitHub</a>
-</div>
+<main class="wrap">
+  <section class="entry-detail" id="entry-detail" hidden>
+    <div>
+      <p class="eyebrow" id="skill-no">No. 000</p>
+      <h1 id="skill-name">Entry</h1>
+      <p class="entry-desc" id="skill-desc"></p>
+      <p class="entry-meta" id="skill-meta"></p>
+      <a class="back" href="index.html">&larr; Back to the catalogue</a>
+    </div>
+    <div class="buy-box">
+      <p class="price" id="skill-price">&mdash;</p>
+      <p class="buy-box-note" id="skill-note">One-off payment, no subscription</p>
+      <a class="btn" id="skill-action" href="#">Install</a>
+    </div>
+  </section>
 
-<p id="skill-missing" hidden>Skill not found. <a href="index.html">Back to the marketplace</a>.</p>
+  <section class="spec" id="skill-spec" hidden>
+    <dl id="spec-rows"></dl>
+  </section>
 
-<a href="index.html" class="back">&larr; Back to marketplace</a>
+  <section class="install" id="skill-install" hidden>
+    <div class="section-head">
+      <h2>Installing it</h2>
+      <p class="section-note">Same on every platform</p>
+    </div>
+    <ol>
+      <li><span><strong>Get the files.</strong> Download the skill, or clone the source repository if the entry links to one.</span></li>
+      <li><span><strong>Copy it in.</strong> Put the skill folder into your agent&rsquo;s skills directory &mdash; the folder name is the skill name.</span></li>
+      <li><span><strong>Ask for it.</strong> Tell the agent what you want in plain words. The skill is loaded when it matches the request.</span></li>
+    </ol>
+  </section>
 
-<footer>
-<p>AI Agent Skills Marketplace &mdash; Platform-agnostic. Works with every AI agent. PayPal payments only.</p>
+  <section id="missing" hidden style="padding:60px 0">
+    <p class="eyebrow" style="margin-bottom:14px">Not in the register</p>
+    <h1 style="font-family:var(--serif);font-weight:800;font-size:44px;letter-spacing:-0.025em;margin-bottom:14px">No such entry</h1>
+    <p class="lede" style="margin-bottom:26px">That entry is not published, or the link is wrong.</p>
+    <a class="back" href="index.html">&larr; Back to the catalogue</a>
+  </section>
+</main>
+
+<footer class="colophon">
+  <div class="wrap colophon-grid">
+    <div>
+      <p class="place" id="colophon-place">Arbroath, Angus DD11 4AX, Scotland</p>
+      <p id="colophon-note">Prices in GBP, one-off. Payment by PayPal. No accounts, no subscriptions, no tracking.</p>
+    </div>
+    <div class="colophon-links">
+      <a href="index.html">Catalogue</a>
+      <a href="submit.html">Submit a skill</a>
+      <a href="skills.json">Register data</a>
+    </div>
+  </div>
 </footer>
-</div>
+
 <script>
 function requestedId() {
   var id = new URLSearchParams(window.location.search).get('id');
   return id ? decodeURIComponent(id) : null;
 }
 
-function priceLabel(skill) {
-  if (skill.free || !skill.price) return 'Free';
-  return '$' + skill.price + ' one-time';
+function formatPrice(value, config) {
+  if (!value) return 'Free';
+  return new Intl.NumberFormat(config.locale, {
+    style: 'currency',
+    currency: config.currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  }).format(value);
 }
 
-function paypalReady(data) {
-  var base = data.paypalBase || '';
+function paypalReady(config) {
+  var base = config.paypalBase || '';
   if (base.indexOf('yourname') !== -1) return false;
   return /^https:\/\/paypal\.me\/[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(base);
 }
 
-function showSkill(data, skill) {
-  document.title = skill.name + ' — AI Agent Skills Marketplace';
-  document.getElementById('skill-name').textContent = skill.name;
-  document.getElementById('skill-platform').textContent = skill.platform;
-  document.getElementById('skill-desc').textContent = skill.desc;
-  document.getElementById('skill-category').textContent = skill.category;
-  document.getElementById('skill-verified').hidden = !skill.verified;
-  document.getElementById('skill-price').textContent = priceLabel(skill);
+function applyLocale(config) {
+  document.documentElement.lang = config.locale;
+  var place = document.getElementById('colophon-place');
+  if (place) place.textContent = config.place;
+  var note = document.getElementById('colophon-note');
+  if (note) {
+    note.textContent = 'Prices in ' + config.currency + ', one-off. Payment by PayPal. ' +
+      'No accounts, no subscriptions, no tracking.';
+  }
+  var issue = document.getElementById('wordmark-issue');
+  if (issue && config.issue) issue.textContent = config.issue;
+}
 
+function showSkill(skill, config) {
+  document.title = skill.name + ' \u2014 The Agent Register';
+  document.getElementById('skill-no').textContent = 'No. ' + skill.no;
+  document.getElementById('skill-name').textContent = skill.name;
+  document.getElementById('skill-desc').textContent = skill.desc;
+
+  var meta = document.getElementById('skill-meta');
+  meta.innerHTML = '';
+  [skill.category, skill.platform].forEach(function (text) {
+    var span = document.createElement('span');
+    span.textContent = text;
+    meta.appendChild(span);
+    var sep = document.createElement('span');
+    sep.className = 'sep';
+    sep.textContent = '/';
+    meta.appendChild(sep);
+  });
+  meta.removeChild(meta.lastChild);
+  if (skill.verified) {
+    var badge = document.createElement('span');
+    badge.className = 'verified';
+    badge.textContent = 'Verified';
+    meta.appendChild(badge);
+  }
+  if (skill.publisher) {
+    var pub = document.createElement('span');
+    pub.textContent = skill.publisher;
+    meta.appendChild(pub);
+  }
+
+  document.getElementById('skill-price').textContent = formatPrice(skill.free ? 0 : skill.price, config);
+  document.getElementById('skill-price').className = skill.free || !skill.price ? 'price price-free' : 'price';
+
+  var note = document.getElementById('skill-note');
   var btn = document.getElementById('skill-action');
   if (skill.free && skill.github) {
-    btn.className = 'free-btn';
+    note.textContent = 'Free. Installed straight from the source.';
+    btn.className = 'btn';
     btn.href = skill.github;
+    btn.target = '_blank';
+    btn.rel = 'noopener';
     btn.textContent = 'Install from GitHub';
-  } else if (!paypalReady(data)) {
-    btn.className = 'free-btn';
-    btn.href = '#';
+  } else if (!paypalReady(config)) {
+    note.textContent = 'One-off payment, no subscription';
+    btn.className = 'btn';
     btn.setAttribute('aria-disabled', 'true');
+    btn.href = '#';
     btn.textContent = 'Payments opening soon';
   } else {
-    btn.className = 'paypal-btn';
-    btn.href = (data.paypalBase || '') + '/' + skill.price;
+    note.textContent = 'One-off payment, no subscription';
+    btn.className = 'btn btn-paypal';
+    btn.href = (config.paypalBase || '') + '/' + skill.price;
+    btn.target = '_blank';
+    btn.rel = 'noopener';
     btn.textContent = 'Buy via PayPal';
   }
-  document.getElementById('skill-card').hidden = false;
+
+  document.getElementById('entry-detail').hidden = false;
+  document.getElementById('skill-spec').hidden = false;
+  document.getElementById('skill-install').hidden = false;
+}
+
+function renderSpec(skill, config) {
+  var rows = document.getElementById('spec-rows');
+  rows.innerHTML = '';
+  var entries = [
+    ['Entry', 'No. ' + skill.no],
+    ['Category', skill.category],
+    ['Platforms', skill.platform],
+    ['Format', skill.format || 'Markdown skill (SKILL.md)'],
+    ['Publisher', skill.publisher || 'Uncredited'],
+    ['Price', skill.free ? 'Free' : formatPrice(skill.price, config) + ', one-off'],
+    ['Payment', skill.free ? 'None' : 'PayPal'],
+    ['Verified', skill.verified ? 'Yes — tested by the Register' : 'No']
+  ];
+  entries.forEach(function (pair) {
+    var row = document.createElement('div');
+    row.className = 'spec-row';
+    var dt = document.createElement('dt');
+    dt.textContent = pair[0];
+    var dd = document.createElement('dd');
+    if (pair[0] === 'Verified' && skill.verified) {
+      dd.className = 'verified';
+      dd.textContent = pair[1];
+    } else {
+      dd.textContent = pair[1];
+    }
+    row.appendChild(dt);
+    row.appendChild(dd);
+    rows.appendChild(row);
+  });
 }
 
 function showMissing() {
-  document.title = 'Skill not found — AI Agent Skills Marketplace';
-  document.getElementById('skill-name').textContent = 'Skill not found';
-  document.getElementById('skill-missing').hidden = false;
+  document.title = 'No such entry \u2014 The Agent Register';
+  document.getElementById('missing').hidden = false;
 }
 
 fetch('skills.json')
@@ -104,9 +225,10 @@ fetch('skills.json')
     return response.json();
   })
   .then(function (data) {
+    applyLocale(data.marketplace);
     var id = requestedId();
     var match = (data.skills || []).filter(function (s) { return s.id === id; })[0];
-    if (match) showSkill(data, match); else showMissing();
+    if (match) { showSkill(match, data.marketplace); renderSpec(match, data.marketplace); } else showMissing();
   })
   .catch(function (err) {
     showMissing();

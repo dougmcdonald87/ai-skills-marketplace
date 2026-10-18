@@ -1,49 +1,69 @@
 {
-  "paypalBase": "https://paypal.me/yourname",
+  "marketplace": {
+    "name": "The Agent Register",
+    "issue": "Issue 01",
+    "locale": "en-GB",
+    "currency": "GBP",
+    "place": "Arbroath, Angus DD11 4AX, Scotland",
+    "paypalBase": "https://paypal.me/yourname",
+    "reviewEmail": "dougmoug@gmail.com"
+  },
   "skills": [
     {
       "id": "skill-001",
+      "no": "001",
       "name": "Code Review",
-      "desc": "Two-axis review (Standards + Spec) of your diff. Works with any AI agent plugin.",
-      "platform": "Universal platform",
+      "desc": "Two-axis review of your diff: one pass against the repo's documented standards, one against the spec the work was meant to satisfy. The two run in parallel so neither colours the other.",
+      "platform": "Universal",
+      "format": "Markdown skill (SKILL.md)",
       "category": "Engineering",
       "price": 29,
       "github": null,
       "free": false,
-      "verified": true
+      "verified": true,
+      "publisher": "The Register"
     },
     {
       "id": "skill-002",
+      "no": "002",
       "name": "Grill With Docs",
-      "desc": "Relentless interview that sharpens your plan and leaves a paper trail (ADRs + glossary).",
-      "platform": "Universal platform",
+      "desc": "A relentless interview that sharpens a plan while it is still cheap to change, and leaves the decisions behind in a glossary and a stack of decision records.",
+      "platform": "Universal",
+      "format": "Markdown skill (SKILL.md)",
       "category": "Productivity",
       "price": 0,
       "github": "https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs",
       "free": true,
-      "verified": true
+      "verified": true,
+      "publisher": "Matt Pocock"
     },
     {
       "id": "skill-003",
-      "name": "TDD",
-      "desc": "Test-first development loop. One red-green slice at a time.",
-      "platform": "Universal platform",
+      "no": "003",
+      "name": "Test-Driven Development",
+      "desc": "The red-green-refactor loop, enforced. One failing test at a time, written before the code that makes it pass, and a full suite before the branch is called done.",
+      "platform": "Universal",
+      "format": "Markdown skill (SKILL.md)",
       "category": "Engineering",
       "price": 0,
       "github": "https://github.com/mattpocock/skills/tree/main/skills/engineering/tdd",
       "free": true,
-      "verified": true
+      "verified": true,
+      "publisher": "Matt Pocock"
     },
     {
       "id": "skill-004",
+      "no": "004",
       "name": "Prototype",
-      "desc": "Throwaway code that answers one design question. Logic or UI variant.",
-      "platform": "Universal platform",
+      "desc": "Throwaway code with one job: answer a single design question you cannot settle on paper. Logic variant or interface variant, built to be discarded.",
+      "platform": "Universal",
+      "format": "Markdown skill (SKILL.md)",
       "category": "Productivity",
       "price": 19,
       "github": null,
       "free": false,
-      "verified": true
+      "verified": true,
+      "publisher": "The Register"
     }
   ]
 }

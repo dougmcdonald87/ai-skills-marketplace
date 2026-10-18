@@ -1,94 +1,143 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Submit a Skill &mdash; AI Agent Skills Marketplace</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #111; line-height: 1.5; }
-.container { max-width: 720px; margin: 0 auto; padding: 24px; }
-header { margin-bottom: 32px; }
-h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
-p.sub { color: #555; font-size: 14px; }
-form { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 24px; }
-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; margin-top: 16px; }
-input, textarea, select { width: 100%; padding: 8px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; margin-bottom: 12px; }
-textarea { min-height: 80px; }
-.submit-btn { background: #0070ba; color: #fff; padding: 10px 24px; border: none; border-radius: 4px; font-weight: 600; font-size: 14px; cursor: pointer; width: 100%; }
-.submit-btn:hover { background: #005ea5; }
-.notice { background: #fff; border: 1px solid #ddd; border-left: 4px solid #0070ba; border-radius: 4px; padding: 14px 16px; font-size: 14px; margin-bottom: 20px; }
-.notice a { color: #0070ba; }
-#form-status { font-size: 14px; margin-top: 12px; }
-#form-status.error { color: #b00020; }
-#form-status.ok { color: #0a7d33; }
-.back { display: inline-block; margin-top: 20px; color: #0070ba; text-decoration: none; font-size: 14px; }
-.back:hover { text-decoration: underline; }
-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }
-</style>
+<title>Submit a skill &mdash; The Agent Register</title>
+<meta name="description" content="List your AI agent skill in The Agent Register. Reviewed by hand, paid by PayPal, no signup.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="container">
-<header>
-<h1>Submit a Skill</h1>
-<p class="sub">List your AI agent skill on the marketplace.</p>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="wordmark" href="index.html">
+      <svg class="wordmark-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="18.5" fill="none" stroke="#9a1b16" stroke-width="1.4"/>
+        <circle cx="20" cy="20" r="14" fill="none" stroke="#9a1b16" stroke-width="0.7" opacity="0.55"/>
+        <path d="M13 20.4l4.6 4.6L27 15.6" fill="none" stroke="#9a1b16" stroke-width="2.1" stroke-linecap="square"/>
+      </svg>
+      <span>
+        <span class="wordmark-text">The Agent Register</span>
+        <span class="wordmark-sub" id="wordmark-issue">Issue 01</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html">Catalogue</a>
+      <a href="submit.html" aria-current="page">Submit a skill</a>
+    </nav>
+  </div>
 </header>
 
-<div class="notice">
-<p>Submissions are reviewed by hand. Fill this in and your email app opens with the details
-pre-filled &mdash; send it and the skill is reviewed before it goes live.</p>
-</div>
+<main class="wrap">
+  <section class="hero" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);padding-bottom:44px">
+    <div>
+      <p class="eyebrow" style="margin-bottom:18px">Supply the register</p>
+      <h1 style="font-size:clamp(34px,5vw,58px)">Put your skill<br>in front of <em>everyone</em>.</h1>
+      <p class="lede">Submissions are read by hand. If your skill works, it gets published with a
+        one-off price and a PayPal link you control. No commission, no subscription, no exclusivity.</p>
+    </div>
+    <dl class="hero-facts">
+      <div class="fact">
+        <dt>What we check</dt>
+        <dd>That it does what the entry says, and that it runs on more than one platform.</dd>
+      </div>
+      <div class="fact">
+        <dt>What it costs</dt>
+        <dd id="fact-cost">Nothing to list. You set your own price.</dd>
+      </div>
+      <div class="fact">
+        <dt>Where it goes</dt>
+        <dd id="fact-place">Arbroath, Angus DD11 4AX, Scotland</dd>
+      </div>
+    </dl>
+  </section>
 
-<form id="skill-form">
-<label for="f-name">Skill name</label>
-<input type="text" id="f-name" name="name" placeholder="e.g. Code Review Assistant" required>
+  <section class="section" style="padding-top:8px">
+    <div class="section-head">
+      <h2>The submission</h2>
+      <p class="section-note">Reviewed by hand</p>
+    </div>
+    <p class="notice">Fill this in and your email app opens with the details pre-filled.
+      Send it, and the skill is read before it goes live. Nothing is published without a reply.</p>
 
-<label for="f-desc">Description</label>
-<textarea id="f-desc" name="description" placeholder="What does this skill do?" required></textarea>
+    <div class="submit-grid">
+      <form class="form" id="skill-form">
+        <label for="f-name">Skill name</label>
+        <input type="text" id="f-name" name="name" placeholder="Code Review Assistant" required>
 
-<label for="f-platform">Platform</label>
-<select id="f-platform" name="platform">
-<option>Universal (all AI agents)</option>
-<option>Claude Code</option>
-<option>Cursor</option>
-<option>opencode</option>
-<option>Continue</option>
-</select>
+        <label for="f-desc">Description</label>
+        <textarea id="f-desc" name="description" placeholder="What does it do, and what changes for the person using it?" required></textarea>
 
-<label for="f-category">Category</label>
-<select id="f-category" name="category">
-<option>Engineering</option>
-<option>Productivity</option>
-</select>
+        <label for="f-platform">Platform</label>
+        <select id="f-platform" name="platform">
+          <option>Universal (all AI agents)</option>
+          <option>Claude Code</option>
+          <option>Cursor</option>
+          <option>opencode</option>
+          <option>Continue</option>
+        </select>
 
-<label for="f-price">Price (USD)</label>
-<input type="number" id="f-price" name="price" min="0" step="0.01" placeholder="0.00" required>
+        <label for="f-category">Category</label>
+        <select id="f-category" name="category">
+          <option>Engineering</option>
+          <option>Productivity</option>
+          <option>Research</option>
+          <option>Writing</option>
+        </select>
 
-<label for="f-paypal">PayPal.me link</label>
-<input type="url" id="f-paypal" name="paypal" placeholder="https://paypal.me/yourname">
+        <label for="f-price">Price (GBP)</label>
+        <input type="number" id="f-price" name="price" min="0" step="0.01" placeholder="0.00" required>
+        <p class="form-hint">0.00 publishes it as a free entry.</p>
 
-<label for="f-github">GitHub link (free skills)</label>
-<input type="url" id="f-github" name="github" placeholder="https://github.com/yourname/skill">
+        <label for="f-paypal">PayPal.me link</label>
+        <input type="url" id="f-paypal" name="paypal" placeholder="https://paypal.me/yourname">
+        <p class="form-hint">For paid entries. You set the price, you keep the money.</p>
 
-<button type="submit" class="submit-btn">Submit skill</button>
-<p id="form-status" role="status"></p>
-</form>
+        <label for="f-github">GitHub link</label>
+        <input type="url" id="f-github" name="github" placeholder="https://github.com/you/skill">
 
-<a href="index.html" class="back">&larr; Back to marketplace</a>
+        <button type="submit" class="btn btn-paypal">Send the submission</button>
+        <p class="form-status" id="form-status" role="status"></p>
+      </form>
 
-<footer>
-<p>AI Agent Skills Marketplace &mdash; Platform-agnostic. Works with every AI agent. PayPal payments only.</p>
+      <aside class="submit-aside">
+        <h3>What happens next</h3>
+        <p>Your email arrives with everything you typed. It is read by a person, not a filter.</p>
+        <p>If the skill does what the entry says, it is published with a number, a price and your PayPal link. If it does not, you get told what was wrong.</p>
+        <p>Entries are numbered in the order they are accepted, and the register keeps growing as new skills are submitted.</p>
+        <p class="aside-note">No commission &middot; no exclusivity &middot; no listing fee</p>
+      </aside>
+    </div>
+
+    <a class="back" href="index.html">&larr; Back to the catalogue</a>
+  </section>
+</main>
+
+<footer class="colophon">
+  <div class="wrap colophon-grid">
+    <div>
+      <p class="place" id="colophon-place">Arbroath, Angus DD11 4AX, Scotland</p>
+      <p id="colophon-note">Prices in GBP, one-off. Payment by PayPal. No accounts, no subscriptions, no tracking.</p>
+    </div>
+    <div class="colophon-links">
+      <a href="index.html">Catalogue</a>
+      <a href="submit.html">Submit a skill</a>
+      <a href="skills.json">Register data</a>
+    </div>
+  </div>
 </footer>
-</div>
-<script>
-var REVIEW_EMAIL = 'dougmoug@gmail.com';
 
+<script>
 function fieldValue(id) {
   var el = document.getElementById(id);
   return el && el.value ? el.value.trim() : '';
 }
 
-function buildBody() {
+function buildBody(config) {
   var price = fieldValue('f-price');
   var paypal = fieldValue('f-paypal');
   var github = fieldValue('f-github');
@@ -100,55 +149,77 @@ function buildBody() {
     '',
     'Platform: ' + fieldValue('f-platform'),
     'Category: ' + fieldValue('f-category'),
-    'Price (USD): ' + (price || '0'),
-    'PayPal.me link: ' + (paypal || '(none - free skill)'),
+    'Price (' + config.currency + '): ' + (price || '0'),
+    'PayPal.me link: ' + (paypal || '(none - free entry)'),
     'GitHub link: ' + (github || '(none)'),
     ''
   ].join('\n');
 }
 
-document.getElementById('skill-form').addEventListener('submit', function (event) {
-  event.preventDefault();
-  var status = document.getElementById('form-status');
-  var name = fieldValue('f-name');
-  var price = fieldValue('f-price');
-  var paypal = fieldValue('f-paypal');
-  var github = fieldValue('f-github');
+fetch('skills.json')
+  .then(function (response) { return response.json(); })
+  .then(function (data) {
+    var config = data.marketplace;
+    document.documentElement.lang = config.locale;
+    var place = document.getElementById('fact-place');
+    if (place) place.textContent = config.place;
+    var colophonPlace = document.getElementById('colophon-place');
+    if (colophonPlace) colophonPlace.textContent = config.place;
+    var note = document.getElementById('colophon-note');
+    if (note) {
+      note.textContent = 'Prices in ' + config.currency + ', one-off. Payment by PayPal. ' +
+        'No accounts, no subscriptions, no tracking.';
+    }
+    var issue = document.getElementById('wordmark-issue');
+    if (issue && config.issue) issue.textContent = config.issue;
 
-  if (!name) {
-    status.className = 'error';
-    status.textContent = 'Skill name is required.';
-    return;
-  }
+    document.getElementById('skill-form').addEventListener('submit', function (event) {
+      event.preventDefault();
+      var status = document.getElementById('form-status');
+      var name = fieldValue('f-name');
+      var paypal = fieldValue('f-paypal');
+      var github = fieldValue('f-github');
 
-  if (!paypal && !github) {
-    status.className = 'error';
-    status.textContent = 'Add a PayPal.me link for a paid skill, or a GitHub link for a free skill.';
-    return;
-  }
+      if (!name) {
+        status.className = 'form-status error';
+        status.textContent = 'A skill name is needed.';
+        return;
+      }
 
-  if (paypal && !/^https:\/\/paypal\.me\/[A-Za-z0-9][A-Za-z0-9_.-]*\/?$/.test(paypal)) {
-    status.className = 'error';
-    status.textContent = 'That does not look like a PayPal.me link. It should start with https://paypal.me/';
-    return;
-  }
+      if (!paypal && !github) {
+        status.className = 'form-status error';
+        status.textContent = 'Add a PayPal.me link for a paid entry, or a GitHub link for a free one.';
+        return;
+      }
 
-  if (github && !/^https:\/\/github\.com\/.+/.test(github)) {
-    status.className = 'error';
-    status.textContent = 'That does not look like a GitHub link. It should start with https://github.com/';
-    return;
-  }
+      if (paypal && !/^https:\/\/paypal\.me\/[A-Za-z0-9][A-Za-z0-9_.-]*\/?$/.test(paypal)) {
+        status.className = 'form-status error';
+        status.textContent = 'That does not look like a PayPal.me link. It should start with https://paypal.me/';
+        return;
+      }
 
-  var subject = 'Skill submission: ' + name;
-  var href = 'mailto:' + REVIEW_EMAIL +
-    '?subject=' + encodeURIComponent(subject) +
-    '&body=' + encodeURIComponent(buildBody());
+      if (github && !/^https:\/\/github\.com\/.+/.test(github)) {
+        status.className = 'form-status error';
+        status.textContent = 'That does not look like a GitHub link. It should start with https://github.com/';
+        return;
+      }
 
-  status.className = 'ok';
-  status.textContent = 'Opening your email app. If nothing happens, email ' + REVIEW_EMAIL +
-    ' with the skill details and we will list it.';
-  window.location.href = href;
-});
+      var href = 'mailto:' + config.reviewEmail +
+        '?subject=' + encodeURIComponent('Skill submission: ' + name) +
+        '&body=' + encodeURIComponent(buildBody(config));
+
+      status.className = 'form-status ok';
+      status.textContent = 'Opening your email app. If nothing happens, email ' + config.reviewEmail +
+        ' with the details and the skill will be read.';
+      window.location.href = href;
+    });
+  })
+  .catch(function (err) {
+    var status = document.getElementById('form-status');
+    status.className = 'form-status error';
+    status.textContent = 'Could not load the register settings. Refresh and try again.';
+    console.error(err);
+  });
 </script>
 </body>
 </html>

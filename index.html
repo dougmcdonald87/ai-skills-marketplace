@@ -1,131 +1,260 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI Agent Skills Marketplace</title>
-<style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: system-ui, -apple-system, sans-serif; background: #f5f5f5; color: #111; line-height: 1.5; }
-.container { max-width: 720px; margin: 0 auto; padding: 24px; }
-header { margin-bottom: 32px; }
-h1 { font-size: 24px; font-weight: 600; margin-bottom: 8px; }
-p.sub { color: #555; font-size: 14px; }
-p.sub a { color: #0070ba; }
-.skills-grid { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 32px; }
-.skill-card { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; }
-.skill-card h3 { font-size: 18px; margin-bottom: 4px; }
-.skill-card h3 a { color: #111; text-decoration: none; }
-.skill-card h3 a:hover { text-decoration: underline; }
-.skill-card p.desc { font-size: 14px; color: #444; margin-bottom: 12px; }
-.skill-card .meta { font-size: 12px; color: #777; margin-bottom: 12px; display: flex; gap: 12px; }
-.skill-card .meta .verified { color: #0a7d33; font-weight: 600; }
-.skill-card .price { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
-#load-error { font-size: 14px; color: #b00020; }
-.paypal-btn { display: inline-block; background: #0070ba; color: #fff; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; }
-.paypal-btn:hover { background: #005ea5; }
-.free-btn { display: inline-block; background: #e8e8e8; color: #111; padding: 10px 20px; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 14px; }
-.free-btn:hover { background: #d8d8d8; }
-footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }
-</style>
+<title>The Agent Register &mdash; AI agent skills that fit every platform</title>
+<meta name="description" content="A register of AI agent skills that run on any platform. Buy once, install anywhere. Payment by PayPal, prices in GBP.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="container">
-<header>
-<h1>AI Agent Skills Marketplace</h1>
-<p class="sub">Skills for Cursor, Claude Code, opencode, Continue, and every AI agent. PayPal only. No subscriptions.</p>
-<p class="sub"><a href="submit.html">Submit your skill</a> &mdash; reviewed by hand, no signup.</p>
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <a class="wordmark" href="index.html">
+      <svg class="wordmark-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="18.5" fill="none" stroke="#9a1b16" stroke-width="1.4"/>
+        <circle cx="20" cy="20" r="14" fill="none" stroke="#9a1b16" stroke-width="0.7" opacity="0.55"/>
+        <path d="M13 20.4l4.6 4.6L27 15.6" fill="none" stroke="#9a1b16" stroke-width="2.1" stroke-linecap="square"/>
+      </svg>
+      <span>
+        <span class="wordmark-text">The Agent Register</span>
+        <span class="wordmark-sub" id="wordmark-issue">Issue 01</span>
+      </span>
+    </a>
+    <nav class="nav" aria-label="Primary">
+      <a href="index.html" aria-current="page">Catalogue</a>
+      <a href="submit.html">Submit a skill</a>
+    </nav>
+  </div>
 </header>
 
-<div class="skills-grid" id="skills-grid"></div>
-<p id="load-error" hidden>Could not load skills.json. Run a local server from this folder, for example: <code>python -m http.server</code></p>
+<main>
+  <section class="wrap hero">
+    <div>
+      <p class="eyebrow" style="margin-bottom:18px">Skills for every AI agent</p>
+      <h1>Buy a skill once.<br>Use it <em>everywhere</em>.</h1>
+      <p class="lede">A register of agent skills that do not care which editor you run.
+        Claude Code, Cursor, opencode, Continue &mdash; or anything that can read a Markdown file.
+        One price, one payment, no subscription, no account to create.</p>
+    </div>
+    <dl class="hero-facts">
+      <div class="fact">
+        <dt>Compatibility</dt>
+        <dd>Platform-agnostic by default. Every entry states what it needs.</dd>
+      </div>
+      <div class="fact">
+        <dt>Payment</dt>
+        <dd>PayPal only. One-off payment, nothing recurring.</dd>
+      </div>
+      <div class="fact">
+        <dt>Published from</dt>
+        <dd id="hero-place">Arbroath, Angus DD11 4AX, Scotland</dd>
+      </div>
+    </dl>
+  </section>
 
-<footer>
-<p>AI Agent Skills Marketplace &mdash; Platform-agnostic. Works with every AI agent. PayPal payments only.</p>
+  <section class="wrap section" aria-labelledby="catalogue-heading">
+    <div class="section-head">
+      <h2 id="catalogue-heading">The catalogue</h2>
+      <p class="section-note" id="catalogue-count">Four entries</p>
+    </div>
+
+    <div class="controls">
+      <label class="search" for="search">
+        <svg class="search-mark" viewBox="0 0 16 16" aria-hidden="true">
+          <circle cx="6.8" cy="6.8" r="4.6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+          <path d="M10.4 10.4L14.2 14.2" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+        <input type="search" id="search" placeholder="Search the register" autocomplete="off">
+      </label>
+      <div class="filters" id="filters" role="group" aria-label="Filter by category"></div>
+    </div>
+
+    <div id="catalogue" class="catalogue"></div>
+    <p class="empty" id="empty" hidden>No entries match that.</p>
+    <p class="load-error" id="load-error" hidden>Could not load the register.
+      Run a local server from this folder, for example: <code>python -m http.server</code></p>
+  </section>
+
+  <section class="wrap section" aria-labelledby="how-heading">
+    <div class="section-head">
+      <h2 id="how-heading">How it works</h2>
+      <p class="section-note">Three steps, no account</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <p class="step-n">Step 01</p>
+        <h3>Read the entry</h3>
+        <p>Each entry states what the skill does, what it needs and who published it. Nothing is hidden behind a checkout.</p>
+      </div>
+      <div class="step">
+        <p class="step-n">Step 02</p>
+        <h3>Pay once</h3>
+        <p>Paid entries take a one-off PayPal payment. Free entries go straight to the source.</p>
+      </div>
+      <div class="step">
+        <p class="step-n">Step 03</p>
+        <h3>Install it anywhere</h3>
+        <p>Skills are plain files. Copy them into the agent you already use. Nothing is locked to one platform.</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="colophon">
+  <div class="wrap colophon-grid">
+    <div>
+      <p class="place" id="colophon-place">Arbroath, Angus DD11 4AX, Scotland</p>
+      <p id="colophon-note">Prices in GBP, one-off. Payment by PayPal. No accounts, no subscriptions, no tracking.</p>
+    </div>
+    <div class="colophon-links">
+      <a href="index.html">Catalogue</a>
+      <a href="submit.html">Submit a skill</a>
+      <a href="skills.json">Register data</a>
+    </div>
+  </div>
 </footer>
-</div>
+
 <script>
-function priceLabel(skill) {
-  if (skill.free || !skill.price) return 'Free';
-  return '$' + skill.price + ' one-time';
+function formatPrice(value, config) {
+  if (!value) return 'Free';
+  return new Intl.NumberFormat(config.locale, {
+    style: 'currency',
+    currency: config.currency,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  }).format(value);
 }
 
-function paypalReady(data) {
-  var base = data.paypalBase || '';
+function paypalReady(config) {
+  var base = config.paypalBase || '';
   if (base.indexOf('yourname') !== -1) return false;
   return /^https:\/\/paypal\.me\/[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(base);
 }
 
-function paypalUrl(data, skill) {
-  return (data.paypalBase || '') + '/' + skill.price;
-}
+function buildEntry(skill, config) {
+  var entry = document.createElement('article');
+  entry.className = 'entry';
+  entry.setAttribute('data-skill-id', skill.id);
 
-function actionFor(data, skill) {
-  if (skill.free && skill.github) {
-    return { href: skill.github, cls: 'free-btn', label: 'Install from GitHub' };
-  }
-  if (!paypalReady(data)) {
-    return { href: null, cls: 'free-btn', label: 'Payments opening soon' };
-  }
-  return { href: paypalUrl(data, skill), cls: 'paypal-btn', label: 'Buy via PayPal' };
-}
+  var no = document.createElement('p');
+  no.className = 'entry-no';
+  no.textContent = 'No. ' + skill.no;
 
-function renderSkills(data) {
-  var skills = data.skills || [];
-  var grid = document.getElementById('skills-grid');
-  grid.innerHTML = '';
-  skills.forEach(function (skill) {
-    var card = document.createElement('div');
-    card.className = 'skill-card';
+  var body = document.createElement('div');
+  body.className = 'entry-body';
 
-    var h3 = document.createElement('h3');
-    var link = document.createElement('a');
-    link.href = 'skill-page.html?id=' + encodeURIComponent(skill.id);
-    link.textContent = skill.name;
-    h3.appendChild(link);
+  var name = document.createElement('h3');
+  name.className = 'entry-name';
+  var nameLink = document.createElement('a');
+  nameLink.href = 'skill-page.html?id=' + encodeURIComponent(skill.id);
+  nameLink.textContent = skill.name;
+  name.appendChild(nameLink);
 
-    var desc = document.createElement('p');
-    desc.className = 'desc';
-    desc.textContent = skill.desc;
+  var desc = document.createElement('p');
+  desc.className = 'entry-desc';
+  desc.textContent = skill.desc;
 
-    var meta = document.createElement('div');
-    meta.className = 'meta';
-    [skill.category, skill.platform].forEach(function (text) {
-      var span = document.createElement('span');
-      span.textContent = text;
-      meta.appendChild(span);
-    });
-    if (skill.verified) {
-      var badge = document.createElement('span');
-      badge.className = 'verified';
-      badge.textContent = 'Verified';
-      meta.appendChild(badge);
-    }
-
-    var price = document.createElement('div');
-    price.className = 'price';
-    price.textContent = priceLabel(skill);
-
-    var action = actionFor(data, skill);
-    var btn = document.createElement('a');
-    btn.className = action.cls;
-    if (action.href) {
-      btn.href = action.href;
-      btn.target = '_blank';
-      btn.rel = 'noopener';
-    } else {
-      btn.href = '#';
-      btn.setAttribute('aria-disabled', 'true');
-    }
-    btn.textContent = action.label;
-
-    card.appendChild(h3);
-    card.appendChild(desc);
-    card.appendChild(meta);
-    card.appendChild(price);
-    card.appendChild(btn);
-    grid.appendChild(card);
+  var meta = document.createElement('p');
+  meta.className = 'entry-meta';
+  [skill.category, skill.platform].forEach(function (text) {
+    var span = document.createElement('span');
+    span.textContent = text;
+    meta.appendChild(span);
+    var sep = document.createElement('span');
+    sep.className = 'sep';
+    sep.textContent = '/';
+    meta.appendChild(sep);
   });
+  meta.removeChild(meta.lastChild);
+  if (skill.verified) {
+    var badge = document.createElement('span');
+    badge.className = 'verified';
+    var mark = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    mark.setAttribute('class', 'verified-mark');
+    mark.setAttribute('viewBox', '0 0 12 12');
+    mark.setAttribute('aria-hidden', 'true');
+    var tick = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    tick.setAttribute('d', 'M1.5 6.2l3 3L10.5 2.5');
+    tick.setAttribute('fill', 'none');
+    tick.setAttribute('stroke', 'currentColor');
+    tick.setAttribute('stroke-width', '1.8');
+    mark.appendChild(tick);
+    badge.appendChild(mark);
+    badge.appendChild(document.createTextNode('Verified'));
+    meta.appendChild(badge);
+  }
+  if (skill.publisher) {
+    var pub = document.createElement('span');
+    pub.textContent = skill.publisher;
+    meta.appendChild(pub);
+  }
+
+  body.appendChild(name);
+  body.appendChild(desc);
+  body.appendChild(meta);
+
+  var buy = document.createElement('div');
+  buy.className = 'entry-buy';
+
+  var price = document.createElement('p');
+  price.className = skill.free || !skill.price ? 'price price-free' : 'price';
+  price.textContent = formatPrice(skill.free ? 0 : skill.price, config);
+  buy.appendChild(price);
+
+  var btn = document.createElement('a');
+  btn.className = 'btn';
+  if (skill.free && skill.github) {
+    btn.textContent = 'Install from GitHub';
+    btn.href = skill.github;
+    btn.target = '_blank';
+    btn.rel = 'noopener';
+  } else if (!paypalReady(config)) {
+    btn.className = 'btn';
+    btn.setAttribute('aria-disabled', 'true');
+    btn.href = '#';
+    btn.textContent = 'Payments opening soon';
+  } else {
+    btn.className = 'btn btn-paypal';
+    btn.href = (config.paypalBase || '') + '/' + skill.price;
+    btn.target = '_blank';
+    btn.rel = 'noopener';
+    btn.textContent = 'Buy via PayPal';
+  }
+  buy.appendChild(btn);
+
+  entry.appendChild(no);
+  entry.appendChild(body);
+  entry.appendChild(buy);
+  return entry;
+}
+
+function matches(skill, query, category) {
+  if (category !== 'All' && skill.category !== category) return false;
+  if (!query) return true;
+  var haystack = [skill.name, skill.desc, skill.category, skill.platform, skill.publisher]
+    .join(' ')
+    .toLowerCase();
+  return haystack.indexOf(query) !== -1;
+}
+
+function applyLocale(config) {
+  document.documentElement.lang = config.locale;
+  var place = document.getElementById('hero-place');
+  if (place) place.textContent = config.place;
+  var colophonPlace = document.getElementById('colophon-place');
+  if (colophonPlace) colophonPlace.textContent = config.place;
+  var note = document.getElementById('colophon-note');
+  if (note) {
+    note.textContent = 'Prices in ' + config.currency + ', one-off. Payment by PayPal. ' +
+      'No accounts, no subscriptions, no tracking.';
+  }
+  var issue = document.getElementById('wordmark-issue');
+  if (issue && config.issue) issue.textContent = config.issue;
 }
 
 fetch('skills.json')
@@ -134,7 +263,58 @@ fetch('skills.json')
     return response.json();
   })
   .then(function (data) {
-    renderSkills(data);
+    var config = data.marketplace;
+    var skills = data.skills || [];
+    applyLocale(config);
+
+    var catalogue = document.getElementById('catalogue');
+    var empty = document.getElementById('empty');
+    var count = document.getElementById('catalogue-count');
+    var filters = document.getElementById('filters');
+    var search = document.getElementById('search');
+
+    var categories = ['All'];
+    skills.forEach(function (skill) {
+      if (categories.indexOf(skill.category) === -1) categories.push(skill.category);
+    });
+
+    var activeCategory = 'All';
+
+    categories.forEach(function (category) {
+      var button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'filter';
+      button.textContent = category;
+      button.setAttribute('data-category', category);
+      button.setAttribute('aria-pressed', category === 'All' ? 'true' : 'false');
+      button.addEventListener('click', function () {
+        activeCategory = category;
+        var buttons = filters.querySelectorAll('.filter');
+        for (var i = 0; i < buttons.length; i++) {
+          buttons[i].setAttribute('aria-pressed', buttons[i].getAttribute('data-category') === category ? 'true' : 'false');
+        }
+        render();
+      });
+      filters.appendChild(button);
+    });
+
+    function render() {
+      var query = (search.value || '').trim().toLowerCase();
+      var shown = 0;
+      catalogue.innerHTML = '';
+      skills.forEach(function (skill) {
+        if (!matches(skill, query, activeCategory)) return;
+        catalogue.appendChild(buildEntry(skill, config));
+        shown++;
+      });
+      empty.hidden = shown !== 0;
+      count.textContent = shown === skills.length
+        ? skills.length + ' entries'
+        : shown + ' of ' + skills.length + ' entries';
+    }
+
+    search.addEventListener('input', render);
+    render();
   })
   .catch(function (err) {
     document.getElementById('load-error').hidden = false;
