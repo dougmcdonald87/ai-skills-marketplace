@@ -125,6 +125,10 @@ async function main() {
         viewport: vw,
         scrollWidth: document.documentElement.scrollWidth,
         bodyScrollWidth: document.body.scrollWidth,
+        paypalLinks: Array.prototype.map.call(
+          document.querySelectorAll('a.btn-paypal'),
+          function (a) { return a.href; }
+        ),
         text: (document.body.innerText || '').replace(/\s+/g, ' ').slice(0, 1500),
         offenders: offenders.slice(0, 25)
       }, null, 1);
