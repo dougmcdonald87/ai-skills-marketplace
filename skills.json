@@ -15,13 +15,16 @@
       "name": "Code Review",
       "desc": "Two-axis review of your diff: one pass against the repo's documented standards, one against the spec the work was meant to satisfy. The two run in parallel so neither colours the other.",
       "platform": "Universal",
-      "format": "Markdown skill (SKILL.md)",
       "category": "Engineering",
       "price": 29,
       "github": null,
       "free": false,
       "verified": true,
-      "publisher": "The Register"
+      "publisher": "The Register",
+      "format": "Markdown skill (SKILL.md)",
+      "licence": "MIT",
+      "attribution": "Built on the MIT-licensed review flow by Matt Pocock",
+      "includes": "Both review passes as separate runnable skills, the standards checklist, and the fixed-point workflow. Updates for a year."
     },
     {
       "id": "skill-002",
@@ -29,13 +32,14 @@
       "name": "Grill With Docs",
       "desc": "A relentless interview that sharpens a plan while it is still cheap to change, and leaves the decisions behind in a glossary and a stack of decision records.",
       "platform": "Universal",
-      "format": "Markdown skill (SKILL.md)",
       "category": "Productivity",
       "price": 0,
       "github": "https://github.com/mattpocock/skills/tree/main/skills/engineering/grill-with-docs",
       "free": true,
       "verified": true,
-      "publisher": "Matt Pocock"
+      "publisher": "Matt Pocock",
+      "format": "Markdown skill (SKILL.md)",
+      "licence": "MIT"
     },
     {
       "id": "skill-003",
@@ -43,13 +47,14 @@
       "name": "Test-Driven Development",
       "desc": "The red-green-refactor loop, enforced. One failing test at a time, written before the code that makes it pass, and a full suite before the branch is called done.",
       "platform": "Universal",
-      "format": "Markdown skill (SKILL.md)",
       "category": "Engineering",
       "price": 0,
       "github": "https://github.com/mattpocock/skills/tree/main/skills/engineering/tdd",
       "free": true,
       "verified": true,
-      "publisher": "Matt Pocock"
+      "publisher": "Matt Pocock",
+      "format": "Markdown skill (SKILL.md)",
+      "licence": "MIT"
     },
     {
       "id": "skill-004",
@@ -57,13 +62,16 @@
       "name": "Prototype",
       "desc": "Throwaway code with one job: answer a single design question you cannot settle on paper. Logic variant or interface variant, built to be discarded.",
       "platform": "Universal",
-      "format": "Markdown skill (SKILL.md)",
       "category": "Productivity",
       "price": 19,
       "github": null,
       "free": false,
       "verified": true,
-      "publisher": "The Register"
+      "publisher": "The Register",
+      "format": "Markdown skill (SKILL.md)",
+      "licence": "MIT",
+      "attribution": "Built on the MIT-licensed prototype skill by Matt Pocock",
+      "includes": "Both branches of the prototype skill - the logic harness and the interface variations - and the throwaway rules that stop it turning into production code. Updates for a year."
     }
   ]
 }
