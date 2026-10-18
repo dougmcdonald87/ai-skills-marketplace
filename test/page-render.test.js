@@ -233,6 +233,12 @@ async function main() {
   check('about entry count', about.getElementById('fact-count').textContent, '4 entries, numbered in the order they were accepted.');
   checkTrue('about colophon mentions GBP', about.getElementById('colophon-note').textContent.indexOf('GBP') !== -1);
 
+  // The contact address must render as typed, not shouted by text-transform.
+  const aboutSrc = fs.readFileSync(path.join(ROOT, 'about.html'), 'utf8');
+  check('about email is lowercase in the markup', aboutSrc.indexOf('>dougmoug@gmail.com<') !== -1, true);
+  check('about email button opts out of uppercase', aboutSrc.indexOf('btn btn-plain') !== -1, true);
+  check('about email href is a mailto', aboutSrc.indexOf('href="mailto:dougmoug@gmail.com"') !== -1, true);
+
   // Every page must link to the other three, or a visitor can get stranded.
   pages.forEach(function (file) {
     const src = fs.readFileSync(path.join(ROOT, file), 'utf8');

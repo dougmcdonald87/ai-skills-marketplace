@@ -470,6 +470,13 @@ a:hover { color: var(--seal-2); }
 
 .btn[aria-disabled="true"]:hover { background: none; color: var(--ink-3); }
 
+/* An email address must never be shouted. */
+.btn-plain {
+  text-transform: none;
+  letter-spacing: 0.02em;
+  font-size: 12px;
+}
+
 /* ---------- How it works ---------- */
 
 .steps {
